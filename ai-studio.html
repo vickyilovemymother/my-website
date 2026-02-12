@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Virtual Studio | Vigneshwaran Pugazhenthi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* REUSING CORE STYLES FROM MAIN PAGE */
+        :root { --bg: #0a0a0a; --text-main: #ffffff; --text-muted: #aaaaaa; --accent: #00f2ea; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; cursor: none; }
+        
+        /* Cursor (Same as Main) */
+        .cursor { width: 20px; height: 20px; border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); mix-blend-mode: difference; transition: width 0.3s; }
+        .cursor.hovered { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-color: transparent; }
+
+        /* Navigation */
+        .nav-bar { position: fixed; top: 0; width: 100%; padding: 20px 5%; display: flex; justify-content: space-between; z-index: 100; backdrop-filter: blur(5px); }
+        .nav-logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 24px; color: #fff; text-decoration: none; }
+        
+        /* STUDIO LAYOUT */
+        .studio-container {
+            display: grid; grid-template-columns: 1fr 400px; height: 100vh; padding-top: 80px;
+        }
+
+        /* LEFT: CANVAS & RESULT */
+        .viewport-area {
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            position: relative; background: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+        .result-placeholder {
+            width: 80%; height: 80%; border: 1px dashed rgba(255,255,255,0.2);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #444; font-family: 'Space Grotesk';
+        }
+        .generated-image { width: 100%; height: 100%; object-fit: contain; display: none; border-radius: 8px; box-shadow: 0 0 50px rgba(0,242,234,0.1); }
+
+        /* RIGHT: CONTROLS */
+        .controls-area {
+            padding: 30px; background: #050505; display: flex; flex-direction: column; gap: 25px; overflow-y: auto;
+        }
+
+        h2 { font-family: 'Space Grotesk'; font-size: 20px; color: var(--accent); margin-bottom: 10px; }
+        label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+
+        /* DRAG ZONES */
+        .drop-zone {
+            width: 100%; height: 120px;
+            border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 0.3s; cursor: none; background: rgba(255,255,255,0.02);
+        }
+        .drop-zone:hover, .drop-zone.active { border-color: var(--accent); background: rgba(0,242,234,0.05); }
+        .drop-zone i { font-size: 24px; margin-bottom: 10px; color: #555; }
+        .drop-zone p { font-size: 12px; color: #666; }
+        
+        /* TEXT INPUT */
+        textarea {
+            width: 100%; height: 100px; background: #111; border: 1px solid #333; color: #fff;
+            padding: 15px; border-radius: 8px; font-family: 'Inter'; font-size: 14px; resize: none;
+        }
+        textarea:focus { outline: none; border-color: var(--accent); }
+
+        /* GENERATE BUTTON */
+        .gen-btn {
+            width: 100%; padding: 15px; background: var(--accent); color: #000;
+            border: none; border-radius: 8px; font-weight: 700; font-family: 'Space Grotesk';
+            font-size: 16px; cursor: none; margin-top: auto;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: 0.3s;
+        }
+        .gen-btn:hover { box-shadow: 0 0 20px rgba(0,242,234,0.4); }
+        
+        /* LOADER */
+        .loading-bar { width: 0%; height: 4px; background: var(--accent); position: fixed; top: 0; left: 0; z-index: 200; transition: width 0.2s; }
+    </style>
+</head>
+<body>
+
+    <div class="cursor"></div>
+    <div class="loading-bar"></div>
+
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-logo hover-trigger">VP.AI <span style="font-size:12px; opacity:0.5;">STUDIO</span></a>
+        <a href="index.html" class="hover-trigger" style="color:#fff; text-decoration:none;"><i class="fas fa-times"></i> Close Studio</a>
+    </nav>
+
+    <div class="studio-container">
+        
+        <div class="viewport-area">
+            <div class="result-placeholder" id="placeholder">
+                <i class="fas fa-cube" style="font-size: 40px; margin-bottom: 20px;"></i>
+                <p>AI Output Area</p>
+                <span style="font-size: 12px; color:#333; margin-top:10px;">Render Resolution: 4K</span>
+            </div>
+            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/985392157644917.637d057a1e041.jpg" class="generated-image" id="resultImg" alt="AI Result">
+        </div>
+
+        <div class="controls-area">
+            <div>
+                <h2>01. Input Source</h2>
+                <label>Base Model (Reference)</label>
+                <div class="drop-zone hover-trigger" id="dropModel">
+                    <i class="fas fa-user"></i>
+                    <p>Drag Model Image Here</p>
+                </div>
+            </div>
+
+            <div>
+                <label>Digital Garment (Asset)</label>
+                <div class="drop-zone hover-trigger" id="dropGarment">
+                    <i class="fas fa-tshirt"></i>
+                    <p>Drag Garment (GLB/PNG) Here</p>
+                </div>
+            </div>
+
+            <div>
+                <h2>02. Prompt Engineering</h2>
+                <label>Creative Direction</label>
+                <textarea class="hover-trigger" placeholder="Describe lighting, environment, and style (e.g., 'Cinematic lighting, Cyberpunk street background, 8k resolution')..."></textarea>
+            </div>
+
+            <button class="gen-btn hover-trigger" onclick="simulateGeneration()">
+                <i class="fas fa-magic"></i> GENERATE RENDER
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Cursor Logic
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => { gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 }); });
+        document.querySelectorAll('.hover-trigger').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        // Drag & Drop Simulation
+        ['dropModel', 'dropGarment'].forEach(id => {
+            const zone = document.getElementById(id);
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('active'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('active'));
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('active');
+                zone.innerHTML = `<i class="fas fa-check" style="color:var(--accent)"></i><p>File Uploaded</p>`;
+                zone.style.borderColor = 'var(--accent)';
+            });
+        });
+
+        // SIMULATE AI GENERATION
+        function simulateGeneration() {
+            const btn = document.querySelector('.gen-btn');
+            const loader = document.querySelector('.loading-bar');
+            const placeholder = document.getElementById('placeholder');
+            const img = document.getElementById('resultImg');
+
+            // UI State: Loading
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> PROCESSING...`;
+            placeholder.style.opacity = '0.5';
+            img.style.display = 'none';
+
+            // Fake Progress Bar
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    // UI State: Done
+                    loader.style.width = '0%';
+                    btn.innerHTML = `<i class="fas fa-magic"></i> GENERATE RENDER`;
+                    placeholder.style.display = 'none';
+                    img.style.display = 'block';
+                    gsap.from(img, {opacity: 0, scale: 0.9, duration: 1});
+                } else {
+                    width++;
+                    loader.style.width = width + '%';
+                }
+            }, 30); // 3 seconds simulation
+        }
+    </script>
+</body>
+</html>
