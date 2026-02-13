@@ -10,7 +10,7 @@ export class EnvironmentManager {
     const loader = new RGBELoader();
     const texture = await loader.loadAsync(path);
 
-    texture.mapping = three.EquirectangularReflectionMapping;
+    texture.mapping = THREE.EquirectangularReflectionMapping;
 
     this.sceneManager.scene.environment = texture;
     this.sceneManager.scene.background = texture;
