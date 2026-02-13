@@ -1,4 +1,4 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+import * as three from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 import { RGBELoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/RGBELoader.js";
 
 export class EnvironmentManager {
@@ -10,7 +10,7 @@ export class EnvironmentManager {
     const loader = new RGBELoader();
     const texture = await loader.loadAsync(path);
 
-    texture.mapping = THREE.EquirectangularReflectionMapping;
+    texture.mapping = three.EquirectangularReflectionMapping;
 
     this.sceneManager.scene.environment = texture;
     this.sceneManager.scene.background = texture;
