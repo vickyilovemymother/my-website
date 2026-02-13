@@ -6,21 +6,12 @@ export class ModelLoader {
     this.loader = new GLTFLoader();
 
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath("./vp-configurator/assets/draco/");
+    dracoLoader.setDecoderPath("/vp-configurator/assets/draco/");
     this.loader.setDRACOLoader(dracoLoader);
   }
 
   async loadModel(path) {
     const gltf = await this.loader.loadAsync(path);
-    const model = gltf.scene;
-
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-
-    return model;
+    return gltf.scene;
   }
 }
