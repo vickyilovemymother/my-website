@@ -5,30 +5,33 @@ export class SceneManager {
   constructor() {
     this.container = document.getElementById("vp-canvas");
 
-    this.scene = new three.Scene();
+    this.scene = new THREE.Scene();
 
-    this.camera = new three.PerspectiveCamera(
+    this.camera = new THREE.PerspectiveCamera(
       45,
       this.container.clientWidth / this.container.clientHeight,
       0.1,
       1000
     );
+
     this.camera.position.set(0, 1.5, 4);
 
-    this.renderer = new three.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(
       this.container.clientWidth,
       this.container.clientHeight
     );
 
-    this.renderer.physicallyCorrectLights = true;
-    this.renderer.outputColorSpace = three.SRGBColorSpace;
-    this.renderer.toneMapping = three.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
     this.container.appendChild(this.renderer.domElement);
 
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
+
     this.controls.enableDamping = true;
 
     window.addEventListener("resize", () => this.onResize());
@@ -36,10 +39,6 @@ export class SceneManager {
 
   add(object) {
     this.scene.add(object);
-  }
-
-  remove(object) {
-    this.scene.remove(object);
   }
 
   start() {
