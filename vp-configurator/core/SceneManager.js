@@ -1,13 +1,13 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+import * as three from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/controls/OrbitControls.js";
 
 export class SceneManager {
   constructor() {
     this.container = document.getElementById("vp-canvas");
 
-    this.scene = new THREE.Scene();
+    this.scene = new three.Scene();
 
-    this.camera = new THREE.PerspectiveCamera(
+    this.camera = new three.PerspectiveCamera(
       45,
       this.container.clientWidth / this.container.clientHeight,
       0.1,
@@ -15,15 +15,15 @@ export class SceneManager {
     );
     this.camera.position.set(0, 1.5, 4);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new three.WebGLRenderer({ antialias: true });
     this.renderer.setSize(
       this.container.clientWidth,
       this.container.clientHeight
     );
 
     this.renderer.physicallyCorrectLights = true;
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.outputColorSpace = three.SRGBColorSpace;
+    this.renderer.toneMapping = three.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1;
 
     this.container.appendChild(this.renderer.domElement);
