@@ -1,5 +1,5 @@
-import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/examples/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/loaders/DRACOLoader.js";
 
 export class ModelLoader {
   constructor() {
