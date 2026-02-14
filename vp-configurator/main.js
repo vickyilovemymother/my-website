@@ -25,6 +25,13 @@ async function init() {
   sceneManager.start();
 
   loadingScreen.style.display = "none";
+
+// Expose functions globally for UI buttons
+window.switchGender = switchGender;
+window.setMode = setMode;
+window.changeColor = changeColor;
+
 }
 
 init();
+
