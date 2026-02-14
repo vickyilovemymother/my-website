@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>VP Configurator Engine</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -61,7 +61,6 @@ body{
 }
 
 /* ===== PANELS ===== */
-
 .panel{
     position:absolute;
     top:70px;
@@ -70,22 +69,21 @@ body{
     background:var(--panel);
     backdrop-filter:blur(20px);
     padding:25px;
-    border-right:1px solid rgba(255,255,255,0.1);
     z-index:15;
-}
-
-.right-panel{
-    right:0;
-    border-right:none;
-    border-left:1px solid rgba(255,255,255,0.1);
 }
 
 .left-panel{
     left:0;
+    border-right:1px solid rgba(255,255,255,0.1);
+}
+
+.right-panel{
+    right:0;
+    border-left:1px solid rgba(255,255,255,0.1);
 }
 
 .panel h4{
-    margin-bottom:15px;
+    margin:20px 0 10px;
     font-family:'Space Grotesk';
 }
 
@@ -108,7 +106,6 @@ body{
 }
 
 /* ===== CANVAS ===== */
-
 #vp-canvas{
     position:absolute;
     top:70px;
@@ -117,7 +114,7 @@ body{
     bottom:0;
 }
 
-/* Loading */
+/* ===== LOADING ===== */
 #loading-screen{
     position:absolute;
     inset:0;
@@ -131,13 +128,21 @@ body{
     z-index:100;
 }
 </style>
+
+<!-- IMPORT MAP (MUST BE BEFORE MODULE SCRIPT) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 
 <body>
 
-<div id="loading-screen">
-    Initializing VP Configurator Engine...
-</div>
+<div id="loading-screen">Initializing VP Configurator Engine...</div>
 
 <div class="top-bar">
     <a href="portfolio.html" class="back-btn">← Back</a>
@@ -150,7 +155,7 @@ body{
     <button onclick="switchGender('Men')">Men</button>
     <button onclick="switchGender('Women')">Women</button>
 
-    <h4 style="margin-top:25px;">Mode</h4>
+    <h4>Mode</h4>
     <button onclick="setMode('mix')">Mix & Match</button>
     <button onclick="setMode('dress')">Dress Mode</button>
 </div>
@@ -165,27 +170,10 @@ body{
 
 <div id="vp-canvas"></div>
 
-<!-- THREE CORE -->
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-
-<!-- THREE EXAMPLES -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/DRACOLoader.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/RGBELoader.js"></script>
-
 <!-- YOUR ENGINE -->
 <script src="./vp-configurator/engine.js"></script>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-
+<!-- MAIN THREE MODULE -->
 <script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
