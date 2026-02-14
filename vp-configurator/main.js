@@ -31,7 +31,20 @@ window.switchGender = switchGender;
 window.setMode = setMode;
 window.changeColor = changeColor;
 
+function switchGender(gender) {
+  console.log("Switching to:", gender);
+}
+
+function setMode(mode) {
+  console.log("Mode:", mode);
+}
+
+function changeColor(type, value) {
+  console.log(type, value);
+}
+
 }
 
 init();
+
 
