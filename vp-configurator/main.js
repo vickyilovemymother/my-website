@@ -3,8 +3,6 @@ import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
 import { StateManager } from "./core/StateManager.js";
 
-const loadingScreen = document.getElementById("loading-screen");
-
 const sceneManager = new SceneManager();
 const environmentManager = new EnvironmentManager(sceneManager);
 const modelLoader = new ModelLoader();
@@ -19,7 +17,10 @@ let garments = {
 
 // ================= INIT =================
 
-async function init() {
+window.addEventListener("DOMContentLoaded", async () => {
+
+  const loadingScreen = document.getElementById("loading-screen");
+
   await environmentManager.loadHDR(
     "/vp-configurator/assets/hdr/HC_VP.hdr"
   );
@@ -31,13 +32,13 @@ async function init() {
   populateGarments();
 
   loadingScreen.style.display = "none";
-}
+});
 
-init();
 
 // ================= MANNEQUIN =================
 
 async function loadMannequin(gender) {
+
   if (currentMannequin) {
     sceneManager.scene.remove(currentMannequin);
   }
@@ -52,17 +53,21 @@ async function loadMannequin(gender) {
   currentMannequin = mannequin;
 
   sceneManager.add(mannequin);
+
   stateManager.setMannequin(mannequin);
   stateManager.setGender(gender);
 }
 
+
 // ================= GARMENTS =================
 
 async function loadGarment(type, fileName) {
+
   const gender = stateManager.getState().gender;
 
   const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
+  // remove existing garment of same type
   if (garments[type.toLowerCase()]) {
     sceneManager.scene.remove(garments[type.toLowerCase()]);
   }
@@ -74,12 +79,19 @@ async function loadGarment(type, fileName) {
   sceneManager.add(garment);
 }
 
+
 function populateGarments() {
+
   const topFiles = ["Top01.glb", "Top02.glb"];
   const bottomFiles = ["btm01.glb"];
 
   const topContainer = document.getElementById("top-container");
   const bottomContainer = document.getElementById("bottom-container");
+
+  if (!topContainer || !bottomContainer) {
+    console.warn("Garment containers not found in HTML.");
+    return;
+  }
 
   topContainer.innerHTML = "";
   bottomContainer.innerHTML = "";
@@ -99,12 +111,14 @@ function populateGarments() {
   });
 }
 
-// ================= UI =================
+
+// ================= UI FUNCTIONS =================
 
 async function switchGender(gender) {
+
   await loadMannequin(gender);
 
-  // remove garments when gender changes
+  // remove all garments when gender changes
   Object.keys(garments).forEach((key) => {
     if (garments[key]) {
       sceneManager.scene.remove(garments[key]);
@@ -115,12 +129,15 @@ async function switchGender(gender) {
   populateGarments();
 }
 
+
 function setMode(mode) {
   stateManager.setMode(mode);
   console.log("Mode:", mode);
 }
 
+
 function changeColor(type, value) {
+
   const target = garments[type];
 
   if (!target) return;
@@ -134,7 +151,8 @@ function changeColor(type, value) {
   stateManager.setColor(type, value);
 }
 
-// ================= EXPOSE =================
+
+// ================= EXPOSE TO HTML =================
 
 window.switchGender = switchGender;
 window.setMode = setMode;
