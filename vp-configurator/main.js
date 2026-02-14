@@ -12,6 +12,11 @@ const stateManager = new StateManager();
 
 let currentMannequin = null;
 
+let garments = {
+  top: null,
+  bottom: null
+};
+
 // ================= INIT =================
 
 async function init() {
@@ -19,28 +24,20 @@ async function init() {
     "/vp-configurator/assets/hdr/HC_VP.hdr"
   );
 
-  const mannequin = await modelLoader.loadModel(
-    "/vp-configurator/assets/mannequin/Men_Mannequin.glb"
-  );
-
-  currentMannequin = mannequin;
-
-  sceneManager.add(mannequin);
-  stateManager.setMannequin(mannequin);
+  await loadMannequin("Men");
 
   sceneManager.start();
+
+  populateGarments();
 
   loadingScreen.style.display = "none";
 }
 
 init();
 
-// ================= UI FUNCTIONS =================
+// ================= MANNEQUIN =================
 
-// Switch Gender
-async function switchGender(gender) {
-  console.log("Switching to:", gender);
-
+async function loadMannequin(gender) {
   if (currentMannequin) {
     sceneManager.scene.remove(currentMannequin);
   }
@@ -50,26 +47,81 @@ async function switchGender(gender) {
       ? "/vp-configurator/assets/mannequin/Women_Mannequin.glb"
       : "/vp-configurator/assets/mannequin/Men_Mannequin.glb";
 
-  const newMannequin = await modelLoader.loadModel(path);
+  const mannequin = await modelLoader.loadModel(path);
 
-  currentMannequin = newMannequin;
+  currentMannequin = mannequin;
 
-  sceneManager.add(newMannequin);
-  stateManager.setMannequin(newMannequin);
+  sceneManager.add(mannequin);
+  stateManager.setMannequin(mannequin);
   stateManager.setGender(gender);
 }
 
-// Set Mode
-function setMode(mode) {
-  console.log("Mode:", mode);
-  stateManager.setMode(mode);
+// ================= GARMENTS =================
+
+async function loadGarment(type, fileName) {
+  const gender = stateManager.getState().gender;
+
+  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
+
+  if (garments[type.toLowerCase()]) {
+    sceneManager.scene.remove(garments[type.toLowerCase()]);
+  }
+
+  const garment = await modelLoader.loadModel(path);
+
+  garments[type.toLowerCase()] = garment;
+
+  sceneManager.add(garment);
 }
 
-// Change Color
-function changeColor(type, value) {
-  console.log("Change color:", type, value);
+function populateGarments() {
+  const topFiles = ["Top01.glb", "Top02.glb"];
+  const bottomFiles = ["btm01.glb"];
 
-  const target = stateManager.getState().mannequin;
+  const topContainer = document.getElementById("top-container");
+  const bottomContainer = document.getElementById("bottom-container");
+
+  topContainer.innerHTML = "";
+  bottomContainer.innerHTML = "";
+
+  topFiles.forEach((file) => {
+    const btn = document.createElement("button");
+    btn.innerText = file.replace(".glb", "");
+    btn.onclick = () => loadGarment("Top", file);
+    topContainer.appendChild(btn);
+  });
+
+  bottomFiles.forEach((file) => {
+    const btn = document.createElement("button");
+    btn.innerText = file.replace(".glb", "");
+    btn.onclick = () => loadGarment("Bottom", file);
+    bottomContainer.appendChild(btn);
+  });
+}
+
+// ================= UI =================
+
+async function switchGender(gender) {
+  await loadMannequin(gender);
+
+  // remove garments when gender changes
+  Object.keys(garments).forEach((key) => {
+    if (garments[key]) {
+      sceneManager.scene.remove(garments[key]);
+      garments[key] = null;
+    }
+  });
+
+  populateGarments();
+}
+
+function setMode(mode) {
+  stateManager.setMode(mode);
+  console.log("Mode:", mode);
+}
+
+function changeColor(type, value) {
+  const target = garments[type];
 
   if (!target) return;
 
@@ -82,7 +134,7 @@ function changeColor(type, value) {
   stateManager.setColor(type, value);
 }
 
-// ================= EXPOSE TO HTML =================
+// ================= EXPOSE =================
 
 window.switchGender = switchGender;
 window.setMode = setMode;
