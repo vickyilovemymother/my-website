@@ -1,6 +1,5 @@
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/controls/OrbitControls.js";
 
 export class SceneManager {
   constructor() {
@@ -23,8 +22,8 @@ export class SceneManager {
       this.container.clientHeight
     );
 
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.container.appendChild(this.renderer.domElement);
 
