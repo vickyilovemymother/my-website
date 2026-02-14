@@ -70,6 +70,7 @@ body{
     backdrop-filter:blur(20px);
     padding:25px;
     z-index:15;
+    overflow-y:auto;
 }
 
 .left-panel{
@@ -89,7 +90,7 @@ body{
 
 .panel button{
     width:100%;
-    margin-bottom:10px;
+    margin-bottom:8px;
     padding:8px;
     background:transparent;
     border:1px solid rgba(255,255,255,0.2);
@@ -97,6 +98,7 @@ body{
     border-radius:6px;
     cursor:pointer;
     transition:0.3s;
+    font-size:12px;
 }
 
 .panel button:hover{
@@ -129,7 +131,6 @@ body{
 }
 </style>
 
-<!-- IMPORT MAP (MUST BE BEFORE MODULE SCRIPT) -->
 <script type="importmap">
 {
   "imports": {
@@ -147,10 +148,12 @@ body{
 <div class="top-bar">
     <a href="portfolio.html" class="back-btn">← Back</a>
     <div class="top-title">VP Configurator Engine</div>
-    <div id="status-indicator" style="color:var(--accent); font-size:12px;">READY</div>
+    <div style="color:var(--accent); font-size:12px;">READY</div>
 </div>
 
+<!-- LEFT PANEL -->
 <div class="panel left-panel">
+
     <h4>Gender</h4>
     <button onclick="switchGender('Men')">Men</button>
     <button onclick="switchGender('Women')">Women</button>
@@ -158,32 +161,26 @@ body{
     <h4>Mode</h4>
     <button onclick="setMode('mix')">Mix & Match</button>
     <button onclick="setMode('dress')">Dress Mode</button>
+
+    <!-- GARMENT SECTIONS -->
+    <h4>Top</h4>
+    <div id="top-container"></div>
+
+    <h4>Bottom</h4>
+    <div id="bottom-container"></div>
+
 </div>
-<div class="panel left-panel">
-    <h4>Gender</h4>
-    <button onclick="switchGender('Men')">Men</button>
-    <button onclick="switchGender('Women')">Women</button>
 
-    <h4>Mode</h4>
-    <button onclick="setMode('mix')">Mix & Match</button>
-    <button onclick="setMode('dress')">Dress Mode</button>
-</div>
-
-
+<!-- RIGHT PANEL -->
 <div class="panel right-panel">
     <h4>Color</h4>
     <input type="color" onchange="changeColor('top', this.value)">
     <input type="color" onchange="changeColor('bottom', this.value)">
-    <input type="color" onchange="changeColor('jacket', this.value)">
-    <input type="color" onchange="changeColor('dress', this.value)">
 </div>
 
 <div id="vp-canvas"></div>
 
-<!-- MAIN THREE MODULE -->
 <script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
 </html>
-
-
