@@ -20,7 +20,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 container.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
 // HDR
