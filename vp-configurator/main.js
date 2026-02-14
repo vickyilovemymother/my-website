@@ -82,7 +82,7 @@ async function loadGarment(type, fileName) {
 
 function populateGarments() {
 
-  const topFiles = ["Top01.glb", "Top02.glb"];
+  const topFiles = ["top01.glb", "top02.glb"];
   const bottomFiles = ["btm01.glb"];
 
   const topContainer = document.getElementById("top-container");
@@ -157,3 +157,4 @@ function changeColor(type, value) {
 window.switchGender = switchGender;
 window.setMode = setMode;
 window.changeColor = changeColor;
+
