@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
@@ -19,9 +20,72 @@ let garments = {
   dress: null
 };
 
-/* ===============================
-   GARMENT CONFIG
-================================= */
+/* ================= INIT ================= */
+
+async function init() {
+  await environmentManager.loadHDR(
+    "/vp-configurator/assets/hdr/hc_vp.hdr"
+  );
+
+  await loadMannequin("men");
+
+  sceneManager.start();
+
+  populateSliders("men");
+  setMode("mix");
+
+  if (loadingScreen) loadingScreen.style.display = "none";
+}
+
+init();
+
+/* ================= CAMERA FIT ================= */
+
+function fitCameraToModel(model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = sceneManager.camera.fov * (Math.PI / 180);
+
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+  cameraZ *= 1.6;
+
+  sceneManager.camera.position.set(center.x, center.y, cameraZ);
+  sceneManager.camera.lookAt(center);
+
+  if (sceneManager.controls) {
+    sceneManager.controls.target.copy(center);
+    sceneManager.controls.update();
+  }
+}
+
+/* ================= MANNEQUIN ================= */
+
+async function loadMannequin(gender) {
+  const path =
+    gender === "women"
+      ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
+      : "/vp-configurator/assets/mannequin/men_mannequin.glb";
+
+  if (currentMannequin) {
+    sceneManager.scene.remove(currentMannequin);
+  }
+
+  const mannequin = await modelLoader.loadModel(path);
+
+  mannequin.position.set(0, 0, 0);
+
+  sceneManager.add(mannequin);
+  currentMannequin = mannequin;
+
+  stateManager.setGender(gender);
+
+  fitCameraToModel(mannequin);
+}
+
+/* ================= GARMENTS ================= */
 
 const garmentConfig = {
   men: {
@@ -38,88 +102,6 @@ const garmentConfig = {
   }
 };
 
-/* ===============================
-   INIT ENGINE
-================================= */
-
-async function init() {
-  try {
-    console.log("Initializing engine...");
-
-    await environmentManager.loadHDR(
-      "/vp-configurator/assets/hdr/hc_vp.hdr"
-    );
-
-    await loadMannequin("men");
-
-    sceneManager.start();
-
-    setupFixedCamera();
-
-    populateSliders("men");
-    setMode("mix");
-
-    if (loadingScreen) {
-      loadingScreen.style.display = "none";
-    }
-
-    console.log("Engine initialized successfully");
-  } catch (error) {
-    console.error("Initialization failed:", error);
-  }
-}
-
-init();
-
-/* ===============================
-   FIXED CAMERA SETUP
-================================= */
-
-function setupFixedCamera() {
-  const camera = sceneManager.camera;
-
-  camera.position.set(0, 1.6, 3.5);
-  camera.lookAt(0, 1.2, 0);
-
-  console.log("Fixed camera applied");
-}
-
-/* ===============================
-   MANNEQUIN LOADER
-================================= */
-
-async function loadMannequin(gender) {
-  try {
-    const path =
-      gender === "women"
-        ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
-        : "/vp-configurator/assets/mannequin/men_mannequin.glb";
-
-    if (currentMannequin) {
-      sceneManager.scene.remove(currentMannequin);
-    }
-
-    const mannequin = await modelLoader.loadModel(path);
-
-    mannequin.position.set(0, 0, 0);
-    mannequin.rotation.set(0, 0, 0);
-    mannequin.scale.set(1, 1, 1);
-
-    sceneManager.add(mannequin);
-    currentMannequin = mannequin;
-
-    stateManager.setGender(gender);
-
-    console.log("Loaded mannequin:", gender);
-  } catch (error) {
-    console.error("Mannequin load failed:", error);
-  }
-}
-
-/* ===============================
-   POPULATE SLIDERS
-================================= */
-
 function populateSliders(gender) {
   const config = garmentConfig[gender];
 
@@ -135,20 +117,12 @@ function populateCategory(category, items, gender) {
 
   slider.innerHTML = "";
 
-  if (!items || items.length === 0) {
-    console.log(`No items found for ${category}`);
-    return;
-  }
-
   items.forEach((name) => {
     const card = document.createElement("div");
     card.className = "garment-card";
 
     const img = document.createElement("img");
     img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
-
-    img.onerror = () =>
-      console.error("Thumbnail missing:", img.src);
 
     card.appendChild(img);
 
@@ -166,63 +140,68 @@ function populateCategory(category, items, gender) {
   });
 }
 
-/* ===============================
-   GARMENT LOADER
-================================= */
-
 async function loadGarment(type, fileName) {
-  try {
-    const gender = stateManager.getState().gender;
+  const gender = stateManager.getState().gender;
+  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
-    const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
+  const model = await modelLoader.loadModel(path);
 
-    console.log("Loading garment:", path);
-
-    const model = await modelLoader.loadModel(path);
-
-    if (garments[type]) {
-      sceneManager.scene.remove(garments[type]);
-    }
-
-    model.position.set(0, 0, 0);
-    model.rotation.set(0, 0, 0);
-    model.scale.set(1, 1, 1);
-
-    garments[type] = model;
-
-    sceneManager.add(model);
-
-    console.log("Garment loaded:", type, fileName);
-  } catch (error) {
-    console.error("Garment load failed:", error);
+  if (garments[type]) {
+    sceneManager.scene.remove(garments[type]);
   }
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.material.transparent = true;
+      child.material.opacity = 0;
+    }
+  });
+
+  garments[type] = model;
+  sceneManager.add(model);
+
+  fadeIn(model);
 }
 
-/* ===============================
-   COLOR CHANGE
-================================= */
+/* ================= FADE ================= */
+
+function fadeIn(object) {
+  let opacity = 0;
+
+  function animate() {
+    opacity += 0.05;
+
+    object.traverse((child) => {
+      if (child.isMesh) {
+        child.material.opacity = opacity;
+      }
+    });
+
+    if (opacity < 1) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  animate();
+}
+
+/* ================= COLOR ================= */
 
 function changeColor(type, value) {
   if (!garments[type]) return;
 
   garments[type].traverse((child) => {
-    if (child.isMesh && child.material) {
+    if (child.isMesh) {
       child.material.color.set(value);
     }
   });
-
-  console.log("Color changed:", type, value);
 }
 
-/* ===============================
-   MODE CONTROL
-================================= */
+/* ================= MODE ================= */
 
 function setMode(mode) {
   const mix = document.getElementById("mix-section");
   const dress = document.getElementById("dress-section");
-
-  if (!mix || !dress) return;
 
   if (mode === "mix") {
     mix.style.display = "block";
@@ -231,22 +210,13 @@ function setMode(mode) {
     mix.style.display = "none";
     dress.style.display = "block";
   }
-
-  stateManager.setMode(mode);
-
-  console.log("Mode:", mode);
 }
 
-/* ===============================
-   GENDER SWITCH
-================================= */
+/* ================= GENDER ================= */
 
 async function switchGender(gender) {
-  const normalized = gender.toLowerCase();
+  await loadMannequin(gender);
 
-  await loadMannequin(normalized);
-
-  // Remove existing garments
   Object.keys(garments).forEach((key) => {
     if (garments[key]) {
       sceneManager.scene.remove(garments[key]);
@@ -254,14 +224,72 @@ async function switchGender(gender) {
     }
   });
 
-  populateSliders(normalized);
-
-  console.log("Switched gender:", normalized);
+  populateSliders(gender);
 }
 
-/* ===============================
-   GLOBAL EXPORT
-================================= */
+/* ================= SHORTCUTS ================= */
+
+window.addEventListener("keydown", (e) => {
+  if (!currentMannequin) return;
+
+  const distance = sceneManager.camera.position.length();
+
+  switch (e.key) {
+    case "2": moveCamera(0, 1.2, distance); break;
+    case "8": moveCamera(0, 1.2, -distance); break;
+    case "4": moveCamera(-distance, 1.2, 0); break;
+    case "6": moveCamera(distance, 1.2, 0); break;
+    case "5": moveCamera(0, distance, 0); break;
+    case "0": moveCamera(0, -distance, 0); break;
+  }
+});
+
+function moveCamera(x, y, z) {
+  sceneManager.camera.position.set(x, y, z);
+  sceneManager.camera.lookAt(0, 1.2, 0);
+}
+
+/* ================= HDR INTENSITY ================= */
+
+document.getElementById("hdrIntensity")?.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+
+  sceneManager.scene.traverse((child) => {
+    if (child.isMesh && child.material.envMapIntensity !== undefined) {
+      child.material.envMapIntensity = value;
+    }
+  });
+});
+
+/* ================= BACKGROUND ================= */
+
+document.getElementById("bgColorPicker")?.addEventListener("input", (e) => {
+  sceneManager.renderer.setClearColor(e.target.value);
+});
+
+/* ================= EXPORT ================= */
+
+window.exportImage = function () {
+  const size = parseInt(document.getElementById("resolutionSelect").value);
+
+  const renderer = sceneManager.renderer;
+  const camera = sceneManager.camera;
+  const scene = sceneManager.scene;
+
+  const originalSize = renderer.getSize(new THREE.Vector2());
+
+  renderer.setSize(size, size);
+  renderer.render(scene, camera);
+
+  const dataURL = renderer.domElement.toDataURL("image/png");
+
+  const link = document.createElement("a");
+  link.href = dataURL;
+  link.download = "vp_render.png";
+  link.click();
+
+  renderer.setSize(originalSize.x, originalSize.y);
+};
 
 window.switchGender = switchGender;
 window.setMode = setMode;
