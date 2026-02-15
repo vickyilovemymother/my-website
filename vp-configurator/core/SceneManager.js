@@ -1,19 +1,19 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/controls/OrbitControls.js";
 
 export class SceneManager {
   constructor() {
-
     this.container = document.getElementById("vp-canvas");
 
     if (!this.container) {
-      throw new Error("❌ vp-canvas container not found in HTML.");
+      throw new Error("vp-canvas container not found.");
     }
 
     /* =============================
        SCENE
     ============================== */
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color("#000000");
 
     /* =============================
        CAMERA
@@ -32,8 +32,8 @@ export class SceneManager {
     ============================== */
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true, // required for transparent export
-      preserveDrawingBuffer: true // required for image export
+      alpha: true,
+      preserveDrawingBuffer: true // needed for export
     });
 
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -46,6 +46,8 @@ export class SceneManager {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1;
+
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.container.appendChild(this.renderer.domElement);
@@ -60,17 +62,28 @@ export class SceneManager {
 
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
+    this.controls.target.set(0, 1, 0);
 
     /* =============================
-       EVENTS
+       LIGHT (Basic Fallback Light)
+    ============================== */
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 10, 5);
+    light.castShadow = true;
+    this.scene.add(light);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+    this.scene.add(ambient);
+
+    /* =============================
+       RESIZE HANDLER
     ============================== */
     window.addEventListener("resize", () => this.onResize());
   }
 
   /* =============================
-     PUBLIC METHODS
+     ADD OBJECT
   ============================== */
-
   add(object) {
     this.scene.add(object);
   }
@@ -79,6 +92,42 @@ export class SceneManager {
     this.scene.remove(object);
   }
 
+  /* =============================
+     BACKGROUND CONTROL
+  ============================== */
+  setBackground(color) {
+    this.scene.background = new THREE.Color(color);
+  }
+
+  /* =============================
+     HDR INTENSITY CONTROL
+  ============================== */
+  setExposure(value) {
+    this.renderer.toneMappingExposure = value;
+  }
+
+  /* =============================
+     AUTO FIT CAMERA TO OBJECT
+     (Does NOT move object)
+  ============================== */
+  fitCameraToObject(object, offset = 1.3) {
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = this.camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+    cameraZ *= offset;
+
+    this.camera.position.set(center.x, center.y, cameraZ);
+    this.controls.target.copy(center);
+    this.controls.update();
+  }
+
+  /* =============================
+     START RENDER LOOP
+  ============================== */
   start() {
     const animate = () => {
       requestAnimationFrame(animate);
@@ -88,35 +137,39 @@ export class SceneManager {
     animate();
   }
 
+  /* =============================
+     RESIZE
+  ============================== */
   onResize() {
-    if (!this.container) return;
-
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
 
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-
     this.renderer.setSize(width, height);
   }
 
   /* =============================
-     EXPORT SUPPORT
+     EXPORT IMAGE
   ============================== */
+  exportImage(width, height, transparent = false) {
+    const originalSize = new THREE.Vector2();
+    this.renderer.getSize(originalSize);
 
-  renderOnce() {
+    const originalBackground = this.scene.background;
+
+    if (transparent) {
+      this.scene.background = null;
+    }
+
+    this.renderer.setSize(width, height);
     this.renderer.render(this.scene, this.camera);
-  }
 
-  getCanvas() {
-    return this.renderer.domElement;
-  }
+    const dataURL = this.renderer.domElement.toDataURL("image/png");
 
-  setBackgroundColor(color) {
-    this.scene.background = new THREE.Color(color);
-  }
+    this.renderer.setSize(originalSize.x, originalSize.y);
+    this.scene.background = originalBackground;
 
-  setHDRIntensity(value) {
-    this.renderer.toneMappingExposure = value;
+    return dataURL;
   }
 }
