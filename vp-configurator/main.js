@@ -300,6 +300,3 @@ async function switchGender(gender) {
 
   populateSliders(gender);
 }
-
-
-
