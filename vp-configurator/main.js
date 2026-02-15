@@ -4,21 +4,57 @@ import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
 import { StateManager } from "./core/StateManager.js";
 
-const loadingScreen = document.getElementById("loading-screen");
+/* =====================================================
+   GLOBALS
+===================================================== */
 
-const sceneManager = new SceneManager();
-const environmentManager = new EnvironmentManager(sceneManager);
-const modelLoader = new ModelLoader();
-const stateManager = new StateManager();
+let sceneManager;
+let environmentManager;
+let modelLoader;
+let stateManager;
 
 let currentMannequin = null;
-let garments = {};
 
+let garments = {
+  top: null,
+  bottom: null,
+  jacket: null,
+  dress: null
+};
 
+const garmentConfig = {
+  men: {
+    top: ["top01", "top02"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  },
+  women: {
+    top: ["top01"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  }
+};
 
-/* ==============================
-   INITIALIZE
-============================== */
+/* =====================================================
+   SAFE DOM INIT
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+  sceneManager = new SceneManager();
+  environmentManager = new EnvironmentManager(sceneManager);
+  modelLoader = new ModelLoader();
+  stateManager = new StateManager();
+
+  await init();
+
+});
+
+/* =====================================================
+   INIT ENGINE
+===================================================== */
 
 async function init() {
   try {
@@ -31,52 +67,24 @@ async function init() {
 
     sceneManager.start();
 
+    populateSliders("men");
     setMode("mix");
 
+    const loadingScreen = document.getElementById("loading-screen");
     if (loadingScreen) loadingScreen.style.display = "none";
 
-    console.log("VP Engine Ready");
+    setupCameraShortcuts();
 
-  } catch (err) {
-    console.error("Init error:", err);
+    console.log("Engine initialized successfully");
+
+  } catch (error) {
+    console.error("Initialization failed:", error);
   }
 }
 
-init();
-
-
-
-/* ==============================
-   CAMERA FIT (NO MANNEQUIN MOVE)
-============================== */
-
-function fitCameraToModel(model) {
-
-  const box = new THREE.Box3().setFromObject(model);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = sceneManager.camera.fov * (Math.PI / 180);
-
-  let distance = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-  distance *= 1.8;
-
-  sceneManager.camera.position.set(center.x, center.y, distance);
-  sceneManager.camera.lookAt(center);
-
-  if (sceneManager.controls) {
-    sceneManager.controls.target.copy(center);
-    sceneManager.controls.update();
-  }
-
-}
-
-
-
-/* ==============================
-   LOAD MANNEQUIN
-============================== */
+/* =====================================================
+   MANNEQUIN LOADER + AUTO CAMERA FIT
+===================================================== */
 
 async function loadMannequin(gender) {
 
@@ -91,148 +99,190 @@ async function loadMannequin(gender) {
 
   const mannequin = await modelLoader.loadModel(path);
 
-  mannequin.position.set(0, 0, 0);
-
   sceneManager.add(mannequin);
   currentMannequin = mannequin;
 
   stateManager.setGender(gender);
 
-  fitCameraToModel(mannequin);
+  fitCameraToObject(mannequin);
+
+  console.log("Loaded mannequin:", gender);
 }
 
+/* =====================================================
+   CAMERA AUTO FIT (PRO LEVEL)
+===================================================== */
 
+function fitCameraToObject(object) {
 
-/* ==============================
-   CAMERA SHORTCUT SYSTEM
-============================== */
-
-window.addEventListener("keydown", (e) => {
-
-  if (!currentMannequin) return;
-
-  const box = new THREE.Box3().setFromObject(currentMannequin);
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
-  const radius = box.getSize(new THREE.Vector3()).length();
 
-  const distance = radius * 1.5;
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = sceneManager.camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-  switch (e.key) {
+  cameraZ *= 1.4;
 
-    case "2": // Front
-      moveCamera(center.x, center.y, distance, center);
-      break;
+  sceneManager.camera.position.set(center.x, center.y, cameraZ);
+  sceneManager.camera.lookAt(center);
 
-    case "8": // Back
-      moveCamera(center.x, center.y, -distance, center);
-      break;
+  sceneManager.controls.target.copy(center);
+  sceneManager.controls.update();
+}
 
-    case "4": // Left
-      moveCamera(-distance, center.y, center.z, center);
-      break;
+/* =====================================================
+   CAMERA SHORTCUTS
+===================================================== */
 
-    case "6": // Right
-      moveCamera(distance, center.y, center.z, center);
-      break;
+function setupCameraShortcuts() {
 
-    case "5": // Top
-      moveCamera(center.x, distance, center.z, center);
-      break;
+  document.addEventListener("keydown", (e) => {
 
-    case "0": // Bottom
-      moveCamera(center.x, -distance, center.z, center);
-      break;
+    if (!currentMannequin) return;
 
-  }
+    const box = new THREE.Box3().setFromObject(currentMannequin);
+    const center = box.getCenter(new THREE.Vector3());
+    const distance = 4;
 
-});
+    switch (e.key) {
+      case "2": // Front
+        sceneManager.camera.position.set(center.x, center.y, distance);
+        break;
 
-function moveCamera(x, y, z, target) {
+      case "8": // Back
+        sceneManager.camera.position.set(center.x, center.y, -distance);
+        break;
 
-  sceneManager.camera.position.set(x, y, z);
-  sceneManager.camera.lookAt(target);
+      case "4": // Left
+        sceneManager.camera.position.set(center.x - distance, center.y, 0);
+        break;
 
-  if (sceneManager.controls) {
-    sceneManager.controls.target.copy(target);
+      case "6": // Right
+        sceneManager.camera.position.set(center.x + distance, center.y, 0);
+        break;
+
+      case "5": // Top
+        sceneManager.camera.position.set(center.x, center.y + distance, 0);
+        break;
+
+      case "0": // Bottom
+        sceneManager.camera.position.set(center.x, center.y - distance, 0);
+        break;
+    }
+
+    sceneManager.camera.lookAt(center);
+    sceneManager.controls.target.copy(center);
     sceneManager.controls.update();
-  }
+
+  });
+}
+
+/* =====================================================
+   POPULATE SLIDERS
+===================================================== */
+
+function populateSliders(gender) {
+
+  const config = garmentConfig[gender];
+
+  Object.keys(config).forEach(category => {
+    populateCategory(category, config[category], gender);
+  });
 
 }
 
+function populateCategory(category, items, gender) {
 
+  const slider = document.getElementById(category + "-slider");
+  if (!slider) return;
 
-/* ==============================
-   BACKGROUND CONTROL
-============================== */
+  slider.innerHTML = "";
 
-document.getElementById("bgColorPicker")?.addEventListener("input", (e) => {
+  items.forEach(name => {
 
-  sceneManager.renderer.setClearColor(e.target.value);
+    const card = document.createElement("div");
+    card.className = "garment-card";
 
-});
+    const img = document.createElement("img");
+    img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
 
+    card.appendChild(img);
 
+    card.onclick = async () => {
 
-/* ==============================
-   HDR INTENSITY CONTROL
-============================== */
+      document
+        .querySelectorAll(`#${category}-slider .garment-card`)
+        .forEach(c => c.classList.remove("active"));
 
-document.getElementById("hdrIntensity")?.addEventListener("input", (e) => {
+      card.classList.add("active");
 
-  const value = parseFloat(e.target.value);
+      await loadGarment(category, name + ".glb");
+    };
 
-  sceneManager.scene.traverse((child) => {
-    if (child.isMesh && child.material.envMapIntensity !== undefined) {
-      child.material.envMapIntensity = value;
+    slider.appendChild(card);
+
+  });
+}
+
+/* =====================================================
+   GARMENT LOADER + FADE ANIMATION
+===================================================== */
+
+async function loadGarment(type, fileName) {
+
+  const gender = stateManager.getState().gender;
+  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
+
+  const model = await modelLoader.loadModel(path);
+
+  model.traverse(child => {
+    if (child.isMesh) {
+      child.material.transparent = true;
+      child.material.opacity = 0;
     }
   });
 
-});
+  if (garments[type]) {
+    sceneManager.scene.remove(garments[type]);
+  }
 
+  garments[type] = model;
+  sceneManager.add(model);
 
+  fadeIn(model);
 
-/* ==============================
-   ADVANCED EXPORT
-============================== */
+  console.log("Loaded garment:", type, fileName);
+}
 
-window.exportImage = function () {
+function fadeIn(object) {
 
-  const size = parseInt(
-    document.getElementById("resolutionSelect").value
-  );
+  let opacity = 0;
 
-  const renderer = sceneManager.renderer;
-  const camera = sceneManager.camera;
-  const scene = sceneManager.scene;
+  const interval = setInterval(() => {
 
-  const originalSize = renderer.getSize(new THREE.Vector2());
+    opacity += 0.05;
 
-  renderer.setSize(size, size);
-  renderer.render(scene, camera);
+    object.traverse(child => {
+      if (child.isMesh) {
+        child.material.opacity = opacity;
+      }
+    });
 
-  const dataURL = renderer.domElement.toDataURL("image/png");
+    if (opacity >= 1) clearInterval(interval);
 
-  const link = document.createElement("a");
-  link.href = dataURL;
-  link.download = "vp_render.png";
-  link.click();
+  }, 20);
+}
 
-  renderer.setSize(originalSize.x, originalSize.y);
-
-};
-
-
-
-/* ==============================
-   MODE
-============================== */
+/* =====================================================
+   MODE CONTROL
+===================================================== */
 
 function setMode(mode) {
 
   const mix = document.getElementById("mix-section");
   const dress = document.getElementById("dress-section");
-
-  if (!mix || !dress) return;
 
   if (mode === "mix") {
     mix.style.display = "block";
@@ -242,13 +292,55 @@ function setMode(mode) {
     dress.style.display = "block";
   }
 
+  stateManager.setMode(mode);
 }
 
+/* =====================================================
+   GENDER SWITCH
+===================================================== */
 
+async function switchGender(gender) {
 
-/* ==============================
-   GLOBAL
-============================== */
+  await loadMannequin(gender);
 
-window.switchGender = loadMannequin;
+  Object.keys(garments).forEach(key => {
+    if (garments[key]) {
+      sceneManager.scene.remove(garments[key]);
+      garments[key] = null;
+    }
+  });
+
+  populateSliders(gender);
+}
+
+/* =====================================================
+   BACKGROUND CONTROL (READY)
+===================================================== */
+
+window.setBackgroundColor = (color) => {
+  sceneManager.renderer.setClearColor(color);
+};
+
+/* =====================================================
+   HDR INTENSITY CONTROL (READY)
+===================================================== */
+
+window.setHDRIntensity = (value) => {
+  sceneManager.scene.environmentIntensity = value;
+};
+
+/* =====================================================
+   GLOBAL EXPORT
+===================================================== */
+
+window.switchGender = switchGender;
 window.setMode = setMode;
+window.changeColor = (type, value) => {
+  if (!garments[type]) return;
+
+  garments[type].traverse(child => {
+    if (child.isMesh) {
+      child.material.color.set(value);
+    }
+  });
+};
