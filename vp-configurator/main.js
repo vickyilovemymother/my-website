@@ -17,9 +17,9 @@ let currentGarments = {
 
 async function init() {
   try {
-    //await environmentManager.loadHDR(
-    //"/vp-configurator/assets/hdr/hc_vp.hdr"
-    //);
+    await environmentManager.loadHDR(
+    "/vp-configurator/assets/hdr/hc_vp.hdr"
+    );
 
     await loadMannequin("Men"); // start with Men
 
@@ -146,4 +146,5 @@ window.changeColor = function (type, value) {
 };
 
 init();
+
 
