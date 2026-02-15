@@ -1,186 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VP Configurator Engine</title>
+import { SceneManager } from "./core/SceneManager.js";
+import { EnvironmentManager } from "./core/EnvironmentManager.js";
+import { ModelLoader } from "./core/ModelLoader.js";
+import { StateManager } from "./core/StateManager.js";
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+const loadingScreen = document.getElementById("loading-screen");
 
-<style>
-:root{
-    --bg:#050505;
-    --accent:#00f2ea;
-    --panel:rgba(15,15,15,0.9);
-}
+const sceneManager = new SceneManager();
+const environmentManager = new EnvironmentManager(sceneManager);
+const modelLoader = new ModelLoader();
+const stateManager = new StateManager();
 
-*{margin:0;padding:0;box-sizing:border-box;}
+let currentGarments = {
+  top: null,
+  bottom: null
+};
 
-body{
-    background:var(--bg);
-    font-family:'Inter',sans-serif;
-    color:#fff;
-    overflow:hidden;
-}
+async function init() {
+  try {
+    await environmentManager.loadHDR(
+      "/vp-configurator/assets/hdr/hc_vp.hdr"
+    );
 
-/* ===== TOP BAR ===== */
-.top-bar{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:70px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 40px;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-    background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(15px);
-    z-index:20;
-}
+    await loadMannequin("Men"); // start with Men
 
-.top-title{
-    font-family:'Space Grotesk';
-    font-size:18px;
-    letter-spacing:1px;
-}
+    sceneManager.start();
+    loadingScreen.style.display = "none";
 
-.back-btn{
-    color:#aaa;
-    text-decoration:none;
-    border:1px solid rgba(255,255,255,0.2);
-    padding:8px 18px;
-    border-radius:6px;
-    transition:0.3s;
-}
+    populateGarments();
 
-.back-btn:hover{
-    border-color:var(--accent);
-    color:var(--accent);
-}
-
-/* ===== PANELS ===== */
-.panel{
-    position:absolute;
-    top:70px;
-    width:260px;
-    height:calc(100% - 70px);
-    background:var(--panel);
-    backdrop-filter:blur(20px);
-    padding:25px;
-    z-index:15;
-    overflow-y:auto;
-}
-
-.left-panel{
-    left:0;
-    border-right:1px solid rgba(255,255,255,0.1);
-}
-
-.right-panel{
-    right:0;
-    border-left:1px solid rgba(255,255,255,0.1);
-}
-
-.panel h4{
-    margin:20px 0 10px;
-    font-family:'Space Grotesk';
-}
-
-.panel button{
-    width:100%;
-    margin-bottom:8px;
-    padding:8px;
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.2);
-    color:#aaa;
-    border-radius:6px;
-    cursor:pointer;
-    transition:0.3s;
-    font-size:12px;
-}
-
-.panel button:hover{
-    border-color:var(--accent);
-    color:var(--accent);
-    background:rgba(0,242,234,0.05);
-}
-
-/* ===== CANVAS ===== */
-#vp-canvas{
-    position:absolute;
-    top:70px;
-    left:260px;
-    right:260px;
-    bottom:0;
-}
-
-/* ===== LOADING ===== */
-#loading-screen{
-    position:absolute;
-    inset:0;
-    background:#000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Space Grotesk';
-    letter-spacing:2px;
-    font-size:14px;
-    z-index:100;
-}
-</style>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  } catch (error) {
+    console.error("Initialization failed:", error);
   }
 }
-</script>
-</head>
 
-<body>
+/* ===========================
+   MANNEQUIN LOADING
+=========================== */
 
-<div id="loading-screen">Initializing VP Configurator Engine...</div>
+async function loadMannequin(gender) {
+  try {
+    const state = stateManager.getState();
 
-<div class="top-bar">
-    <a href="portfolio.html" class="back-btn">← Back</a>
-    <div class="top-title">VP Configurator Engine</div>
-    <div style="color:var(--accent); font-size:12px;">READY</div>
-</div>
+    if (state.mannequin) {
+      sceneManager.remove(state.mannequin);
+    }
 
-<!-- LEFT PANEL -->
-<div class="panel left-panel">
+    // IMPORTANT — adjust this if your file names differ
+    const path = `/vp-configurator/assets/mannequin/${gender}_Mannequin.glb`;
 
-    <h4>Gender</h4>
-    <button onclick="switchGender('Men')">Men</button>
-    <button onclick="switchGender('Women')">Women</button>
+    const mannequin = await modelLoader.loadModel(path);
 
-    <h4>Mode</h4>
-    <button onclick="setMode('mix')">Mix & Match</button>
-    <button onclick="setMode('dress')">Dress Mode</button>
+    sceneManager.add(mannequin);
+    stateManager.setMannequin(mannequin);
 
-    <!-- GARMENT SECTIONS -->
-    <h4>Top</h4>
-    <div id="top-container"></div>
+    console.log("Loaded mannequin:", gender);
 
-    <h4>Bottom</h4>
-    <div id="bottom-container"></div>
+  } catch (err) {
+    console.error("Mannequin load failed:", err);
+  }
+}
 
-</div>
+/* ===========================
+   GARMENT BUTTONS
+=========================== */
 
-<!-- RIGHT PANEL -->
-<div class="panel right-panel">
-    <h4>Color</h4>
-    <input type="color" onchange="changeColor('top', this.value)">
-    <input type="color" onchange="changeColor('bottom', this.value)">
-</div>
+function populateGarments() {
+  const topContainer = document.getElementById("top-container");
+  const bottomContainer = document.getElementById("bottom-container");
 
-<div id="vp-canvas"></div>
+  if (!topContainer || !bottomContainer) {
+    console.warn("Containers missing.");
+    return;
+  }
 
-<script type="module" src="./vp-configurator/main.js"></script>
+  topContainer.innerHTML = "";
+  bottomContainer.innerHTML = "";
 
-</body>
-</html>
+  const tops = ["top01.glb", "top02.glb"];
+  const bottoms = ["btm01.glb"];
+
+  const gender = stateManager.getState().gender || "Men";
+  const basePath = `/vp-configurator/assets/${gender.toLowerCase()}`;
+
+  tops.forEach(file => {
+    const btn = document.createElement("button");
+    btn.innerText = file.replace(".glb", "");
+    btn.onclick = () =>
+      loadGarment("top", `${basePath}/top/${file}`);
+    topContainer.appendChild(btn);
+  });
+
+  bottoms.forEach(file => {
+    const btn = document.createElement("button");
+    btn.innerText = file.replace(".glb", "");
+    btn.onclick = () =>
+      loadGarment("bottom", `${basePath}/bottom/${file}`);
+    bottomContainer.appendChild(btn);
+  });
+}
+
+/* ===========================
+   GARMENT LOADER
+=========================== */
+
+async function loadGarment(type, path) {
+  try {
+    if (currentGarments[type]) {
+      sceneManager.remove(currentGarments[type]);
+    }
+
+    const model = await modelLoader.loadModel(path);
+    sceneManager.add(model);
+    currentGarments[type] = model;
+
+    console.log("Loaded:", path);
+
+  } catch (err) {
+    console.error("Garment failed:", path);
+  }
+}
+
+/* ===========================
+   UI GLOBAL FUNCTIONS
+=========================== */
+
+window.switchGender = async function (gender) {
+  stateManager.setGender(gender);
+  await loadMannequin(gender);
+  populateGarments();
+};
+
+window.setMode = function (mode) {
+  stateManager.setMode(mode);
+  console.log("Mode:", mode);
+};
+
+window.changeColor = function (type, value) {
+  if (!currentGarments[type]) return;
+
+  currentGarments[type].traverse(child => {
+    if (child.isMesh) {
+      child.material.color.set(value);
+    }
+  });
+};
+
+init();
