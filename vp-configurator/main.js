@@ -148,3 +148,24 @@ window.changeColor = changeColor;
 window.loadTop01 = () => loadGarment("top", "top01.glb");
 window.loadTop02 = () => loadGarment("top", "top02.glb");
 window.loadBottom01 = () => loadGarment("bottom", "btm01.glb");
+
+/* ===============================
+   MODE Control
+================================= */
+window.setMode = (mode) => {
+
+  const mix = document.getElementById("mix-section");
+  const dress = document.getElementById("dress-section");
+
+  if (mode === "mix") {
+    mix.style.display = "block";
+    dress.style.display = "none";
+  } else {
+    mix.style.display = "none";
+    dress.style.display = "block";
+  }
+
+  console.log("Mode:", mode);
+};
+
+
