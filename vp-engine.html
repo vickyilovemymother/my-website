@@ -245,27 +245,20 @@ body{
 </div>
 
 <!-- RIGHT PANEL -->
-<div class="panel right-panel">
+<h4>Background</h4>
+<input type="color" id="bgColorPicker" value="#000000">
 
-    <h4>Color</h4>
-    <input type="color" onchange="changeColor('top', this.value)">
-    <input type="color" onchange="changeColor('bottom', this.value)">
+<h4>HDR Intensity</h4>
+<input type="range" id="hdrIntensity" min="0" max="5" step="0.1" value="1">
 
-    <h4>Background</h4>
-    <input type="color" id="bgColorPicker">
+<h4>Export</h4>
+<select id="resolutionSelect">
+  <option value="1024">1024 x 1024</option>
+  <option value="2048">2048 x 2048</option>
+  <option value="4096">4096 x 4096</option>
+</select>
+<button onclick="exportImage()">Export PNG</button>
 
-    <h4>HDR Intensity</h4>
-    <input type="range" id="hdrIntensity" min="0" max="5" step="0.1" value="1">
-
-    <h4>Export</h4>
-    <select id="resolutionSelect">
-        <option value="1024">1024x1024</option>
-        <option value="2048">2048x2048</option>
-        <option value="4096">4096x4096</option>
-    </select>
-    <button onclick="exportImage()">Export PNG</button>
-
-</div>
 
 
 <!-- MAIN SCRIPT -->
@@ -273,6 +266,7 @@ body{
 
 </body>
 </html>
+
 
 
 
