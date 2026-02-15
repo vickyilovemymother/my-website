@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
@@ -20,16 +19,16 @@ let garments = {
   dress: null
 };
 
-/* =====================================================
-   GARMENT CONFIG (LOWERCASE ONLY)
-===================================================== */
+/* ===============================
+   GARMENT CONFIG
+================================= */
 
 const garmentConfig = {
   men: {
     top: ["top01", "top02"],
     bottom: ["btm01"],
-    jacket: [],
-    dress: []
+    jacket: ["jkt01"],
+    dress: ["comboset01.png"]
   },
   women: {
     top: ["top01"],
@@ -39,12 +38,14 @@ const garmentConfig = {
   }
 };
 
-/* =====================================================
-   INIT
-===================================================== */
+/* ===============================
+   INIT ENGINE
+================================= */
 
 async function init() {
   try {
+    console.log("Initializing engine...");
+
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
     );
@@ -53,10 +54,14 @@ async function init() {
 
     sceneManager.start();
 
+    setupFixedCamera();
+
     populateSliders("men");
     setMode("mix");
 
-    if (loadingScreen) loadingScreen.style.display = "none";
+    if (loadingScreen) {
+      loadingScreen.style.display = "none";
+    }
 
     console.log("Engine initialized successfully");
   } catch (error) {
@@ -66,10 +71,22 @@ async function init() {
 
 init();
 
-/* =====================================================
+/* ===============================
+   FIXED CAMERA SETUP
+================================= */
+
+function setupFixedCamera() {
+  const camera = sceneManager.camera;
+
+  camera.position.set(0, 1.6, 3.5);
+  camera.lookAt(0, 1.2, 0);
+
+  console.log("Fixed camera applied");
+}
+
+/* ===============================
    MANNEQUIN LOADER
-   (Camera framed, mannequin untouched)
-===================================================== */
+================================= */
 
 async function loadMannequin(gender) {
   try {
@@ -84,12 +101,14 @@ async function loadMannequin(gender) {
 
     const mannequin = await modelLoader.loadModel(path);
 
+    mannequin.position.set(0, 0, 0);
+    mannequin.rotation.set(0, 0, 0);
+    mannequin.scale.set(1, 1, 1);
+
     sceneManager.add(mannequin);
     currentMannequin = mannequin;
 
     stateManager.setGender(gender);
-
-    autoFrameModel(mannequin);
 
     console.log("Loaded mannequin:", gender);
   } catch (error) {
@@ -97,31 +116,9 @@ async function loadMannequin(gender) {
   }
 }
 
-/* =====================================================
-   AUTO CAMERA FRAME (DO NOT MOVE MANNEQUIN)
-===================================================== */
-
-function autoFrameModel(model) {
-  const box = new THREE.Box3().setFromObject(model);
-  const size = box.getSize(new THREE.Vector3());
-
-  const camera = sceneManager.camera;
-
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = camera.fov * (Math.PI / 180);
-
-  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-  cameraZ *= 1.6;
-
-  camera.position.set(0, size.y * 0.5, cameraZ);
-  camera.lookAt(0, size.y * 0.5, 0);
-
-  console.log("Camera framed only (mannequin untouched)");
-}
-
-/* =====================================================
-   SLIDER POPULATION
-===================================================== */
+/* ===============================
+   POPULATE SLIDERS
+================================= */
 
 function populateSliders(gender) {
   const config = garmentConfig[gender];
@@ -138,11 +135,8 @@ function populateCategory(category, items, gender) {
 
   slider.innerHTML = "";
 
-  console.log("Populating", category, items);
-
   if (!items || items.length === 0) {
-    slider.innerHTML =
-      '<div style="font-size:11px;color:#666;">No items</div>';
+    console.log(`No items found for ${category}`);
     return;
   }
 
@@ -153,9 +147,8 @@ function populateCategory(category, items, gender) {
     const img = document.createElement("img");
     img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
 
-    img.onerror = () => {
-      console.warn("Missing thumbnail:", img.src);
-    };
+    img.onerror = () =>
+      console.error("Thumbnail missing:", img.src);
 
     card.appendChild(img);
 
@@ -173,9 +166,9 @@ function populateCategory(category, items, gender) {
   });
 }
 
-/* =====================================================
+/* ===============================
    GARMENT LOADER
-===================================================== */
+================================= */
 
 async function loadGarment(type, fileName) {
   try {
@@ -191,19 +184,23 @@ async function loadGarment(type, fileName) {
       sceneManager.scene.remove(garments[type]);
     }
 
+    model.position.set(0, 0, 0);
+    model.rotation.set(0, 0, 0);
+    model.scale.set(1, 1, 1);
+
     garments[type] = model;
 
     sceneManager.add(model);
 
-    console.log("Loaded garment:", type, fileName);
+    console.log("Garment loaded:", type, fileName);
   } catch (error) {
     console.error("Garment load failed:", error);
   }
 }
 
-/* =====================================================
-   COLOR HANDLER
-===================================================== */
+/* ===============================
+   COLOR CHANGE
+================================= */
 
 function changeColor(type, value) {
   if (!garments[type]) return;
@@ -217,9 +214,9 @@ function changeColor(type, value) {
   console.log("Color changed:", type, value);
 }
 
-/* =====================================================
+/* ===============================
    MODE CONTROL
-===================================================== */
+================================= */
 
 function setMode(mode) {
   const mix = document.getElementById("mix-section");
@@ -240,16 +237,16 @@ function setMode(mode) {
   console.log("Mode:", mode);
 }
 
-/* =====================================================
+/* ===============================
    GENDER SWITCH
-===================================================== */
+================================= */
 
 async function switchGender(gender) {
   const normalized = gender.toLowerCase();
 
   await loadMannequin(normalized);
 
-  // Clear garments
+  // Remove existing garments
   Object.keys(garments).forEach((key) => {
     if (garments[key]) {
       sceneManager.scene.remove(garments[key]);
@@ -259,12 +256,12 @@ async function switchGender(gender) {
 
   populateSliders(normalized);
 
-  console.log("Gender switched:", normalized);
+  console.log("Switched gender:", normalized);
 }
 
-/* =====================================================
+/* ===============================
    GLOBAL EXPORT
-===================================================== */
+================================= */
 
 window.switchGender = switchGender;
 window.setMode = setMode;
