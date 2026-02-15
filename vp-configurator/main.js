@@ -11,23 +11,49 @@ const modelLoader = new ModelLoader();
 const stateManager = new StateManager();
 
 let currentMannequin = null;
-let currentTop = null;
-let currentBottom = null;
+
+let garments = {
+  top: null,
+  bottom: null,
+  jacket: null,
+  dress: null
+};
+
+/* ===============================
+   GARMENT CONFIG
+================================= */
+
+const garmentConfig = {
+  men: {
+    top: ["top01", "top02"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  },
+  women: {
+    top: ["top01"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  }
+};
 
 /* ===============================
    INITIALIZE ENGINE
 ================================= */
+
 async function init() {
   try {
-    // Load HDR
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
     );
 
-    // Load default mannequin
     await loadMannequin("men");
 
     sceneManager.start();
+
+    populateSliders("men");
+    setMode("mix");
 
     if (loadingScreen) {
       loadingScreen.style.display = "none";
@@ -44,6 +70,7 @@ init();
 /* ===============================
    MANNEQUIN LOADER
 ================================= */
+
 async function loadMannequin(gender) {
   try {
     const path =
@@ -51,10 +78,8 @@ async function loadMannequin(gender) {
         ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
         : "/vp-configurator/assets/mannequin/men_mannequin.glb";
 
-    // Remove old mannequin safely
     if (currentMannequin) {
       sceneManager.scene.remove(currentMannequin);
-      currentMannequin = null;
     }
 
     const mannequin = await modelLoader.loadModel(path);
@@ -71,29 +96,67 @@ async function loadMannequin(gender) {
 }
 
 /* ===============================
+   POPULATE SLIDERS
+================================= */
+
+function populateSliders(gender) {
+  const config = garmentConfig[gender];
+
+  populateCategory("top", config.top, gender);
+  populateCategory("bottom", config.bottom, gender);
+  populateCategory("jacket", config.jacket, gender);
+  populateCategory("dress", config.dress, gender);
+}
+
+function populateCategory(category, items, gender) {
+  const slider = document.getElementById(category + "-slider");
+  if (!slider) return;
+
+  slider.innerHTML = "";
+
+  items.forEach((name) => {
+    const card = document.createElement("div");
+    card.className = "garment-card";
+
+    const img = document.createElement("img");
+    img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
+
+    card.appendChild(img);
+
+    card.onclick = async () => {
+      document
+        .querySelectorAll(`#${category}-slider .garment-card`)
+        .forEach((c) => c.classList.remove("active"));
+
+      card.classList.add("active");
+
+      await loadGarment(category, name + ".glb");
+    };
+
+    slider.appendChild(card);
+  });
+}
+
+/* ===============================
    GARMENT LOADER
 ================================= */
+
 async function loadGarment(type, fileName) {
   try {
     const gender = stateManager.getState().gender;
-
     const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
     const model = await modelLoader.loadModel(path);
 
-    if (type === "top") {
-      if (currentTop) sceneManager.scene.remove(currentTop);
-      currentTop = model;
+    if (garments[type]) {
+      sceneManager.scene.remove(garments[type]);
     }
 
-    if (type === "bottom") {
-      if (currentBottom) sceneManager.scene.remove(currentBottom);
-      currentBottom = model;
-    }
+    garments[type] = model;
 
     sceneManager.add(model);
 
-    console.log("Loaded garment:", fileName);
+    console.log("Loaded garment:", type, fileName);
   } catch (error) {
     console.error("Garment load failed:", error);
   }
@@ -102,60 +165,26 @@ async function loadGarment(type, fileName) {
 /* ===============================
    COLOR HANDLER
 ================================= */
+
 function changeColor(type, value) {
-  let target = null;
+  if (!garments[type]) return;
 
-  if (type === "top") target = currentTop;
-  if (type === "bottom") target = currentBottom;
-
-  if (!target) return;
-
-  target.traverse((child) => {
+  garments[type].traverse((child) => {
     if (child.isMesh) {
       child.material.color.set(value);
     }
   });
-
-  console.log("Changed color:", type, value);
 }
 
 /* ===============================
-   MODE
+   MODE CONTROL
 ================================= */
+
 function setMode(mode) {
-  stateManager.setMode(mode);
-  console.log("Mode:", mode);
-}
-
-/* ===============================
-   GENDER SWITCH
-================================= */
-function switchGender(gender) {
-  const normalized = gender.toLowerCase();
-  loadMannequin(normalized);
-}
-
-/* ===============================
-   GLOBAL UI EXPORT
-================================= */
-window.switchGender = switchGender;
-window.setMode = setMode;
-window.changeColor = changeColor;
-
-/* ===============================
-   GARMENT BUTTONS (OPTIONAL)
-================================= */
-window.loadTop01 = () => loadGarment("top", "top01.glb");
-window.loadTop02 = () => loadGarment("top", "top02.glb");
-window.loadBottom01 = () => loadGarment("bottom", "btm01.glb");
-
-/* ===============================
-   MODE Control
-================================= */
-window.setMode = (mode) => {
-
   const mix = document.getElementById("mix-section");
   const dress = document.getElementById("dress-section");
+
+  if (!mix || !dress) return;
 
   if (mode === "mix") {
     mix.style.display = "block";
@@ -165,7 +194,35 @@ window.setMode = (mode) => {
     dress.style.display = "block";
   }
 
+  stateManager.setMode(mode);
+
   console.log("Mode:", mode);
-};
+}
 
+/* ===============================
+   GENDER SWITCH
+================================= */
 
+async function switchGender(gender) {
+  const normalized = gender.toLowerCase();
+
+  await loadMannequin(normalized);
+
+  // Clear existing garments
+  Object.keys(garments).forEach((key) => {
+    if (garments[key]) {
+      sceneManager.scene.remove(garments[key]);
+      garments[key] = null;
+    }
+  });
+
+  populateSliders(normalized);
+}
+
+/* ===============================
+   GLOBAL EXPORT
+================================= */
+
+window.switchGender = switchGender;
+window.setMode = setMode;
+window.changeColor = changeColor;
