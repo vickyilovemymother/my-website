@@ -10,139 +10,141 @@ const environmentManager = new EnvironmentManager(sceneManager);
 const modelLoader = new ModelLoader();
 const stateManager = new StateManager();
 
-let currentGarments = {
-  top: null,
-  bottom: null
-};
+let currentMannequin = null;
+let currentTop = null;
+let currentBottom = null;
 
+/* ===============================
+   INITIALIZE ENGINE
+================================= */
 async function init() {
   try {
+    // Load HDR
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
     );
 
-    await loadMannequin("Men"); // start with Men
+    // Load default mannequin
+    await loadMannequin("men");
 
     sceneManager.start();
-    loadingScreen.style.display = "none";
 
-    populateGarments();
+    if (loadingScreen) {
+      loadingScreen.style.display = "none";
+    }
 
+    console.log("Engine initialized successfully");
   } catch (error) {
     console.error("Initialization failed:", error);
   }
 }
 
-/* ===========================
-   MANNEQUIN LOADING
-=========================== */
+init();
 
+/* ===============================
+   MANNEQUIN LOADER
+================================= */
 async function loadMannequin(gender) {
   try {
-    const state = stateManager.getState();
+    const path =
+      gender === "women"
+        ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
+        : "/vp-configurator/assets/mannequin/men_mannequin.glb";
 
-    if (state.mannequin) {
-      sceneManager.remove(state.mannequin);
+    // Remove old mannequin safely
+    if (currentMannequin) {
+      sceneManager.scene.remove(currentMannequin);
+      currentMannequin = null;
     }
-
-    // IMPORTANT — adjust this if your file names differ
-    const path = `/vp-configurator/assets/mannequin/${gender}_Mannequin.glb`;
 
     const mannequin = await modelLoader.loadModel(path);
 
     sceneManager.add(mannequin);
-    stateManager.setMannequin(mannequin);
+    currentMannequin = mannequin;
+
+    stateManager.setGender(gender);
 
     console.log("Loaded mannequin:", gender);
-
-  } catch (err) {
-    console.error("Mannequin load failed:", err);
+  } catch (error) {
+    console.error("Mannequin load failed:", error);
   }
 }
 
-/* ===========================
-   GARMENT BUTTONS
-=========================== */
-
-function populateGarments() {
-  const topContainer = document.getElementById("top-container");
-  const bottomContainer = document.getElementById("bottom-container");
-
-  if (!topContainer || !bottomContainer) {
-    console.warn("Containers missing.");
-    return;
-  }
-
-  topContainer.innerHTML = "";
-  bottomContainer.innerHTML = "";
-
-  const tops = ["top01.glb", "top02.glb"];
-  const bottoms = ["btm01.glb"];
-
-  const gender = stateManager.getState().gender || "Men";
-  const basePath = `/vp-configurator/assets/${gender.toLowerCase()}`;
-
-  tops.forEach(file => {
-    const btn = document.createElement("button");
-    btn.innerText = file.replace(".glb", "");
-    btn.onclick = () =>
-      loadGarment("top", `${basePath}/top/${file}`);
-    topContainer.appendChild(btn);
-  });
-
-  bottoms.forEach(file => {
-    const btn = document.createElement("button");
-    btn.innerText = file.replace(".glb", "");
-    btn.onclick = () =>
-      loadGarment("bottom", `${basePath}/bottom/${file}`);
-    bottomContainer.appendChild(btn);
-  });
-}
-
-/* ===========================
+/* ===============================
    GARMENT LOADER
-=========================== */
-
-async function loadGarment(type, path) {
+================================= */
+async function loadGarment(type, fileName) {
   try {
-    if (currentGarments[type]) {
-      sceneManager.remove(currentGarments[type]);
-    }
+    const gender = stateManager.getState().gender;
+
+    const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
     const model = await modelLoader.loadModel(path);
+
+    if (type === "top") {
+      if (currentTop) sceneManager.scene.remove(currentTop);
+      currentTop = model;
+    }
+
+    if (type === "bottom") {
+      if (currentBottom) sceneManager.scene.remove(currentBottom);
+      currentBottom = model;
+    }
+
     sceneManager.add(model);
-    currentGarments[type] = model;
 
-    console.log("Loaded:", path);
-
-  } catch (err) {
-    console.error("Garment failed:", path);
+    console.log("Loaded garment:", fileName);
+  } catch (error) {
+    console.error("Garment load failed:", error);
   }
 }
 
-/* ===========================
-   UI GLOBAL FUNCTIONS
-=========================== */
+/* ===============================
+   COLOR HANDLER
+================================= */
+function changeColor(type, value) {
+  let target = null;
 
-window.switchGender = async function (gender) {
-  stateManager.setGender(gender);
-  await loadMannequin(gender);
-  populateGarments();
-};
+  if (type === "top") target = currentTop;
+  if (type === "bottom") target = currentBottom;
 
-window.setMode = function (mode) {
-  stateManager.setMode(mode);
-  console.log("Mode:", mode);
-};
+  if (!target) return;
 
-window.changeColor = function (type, value) {
-  if (!currentGarments[type]) return;
-
-  currentGarments[type].traverse(child => {
+  target.traverse((child) => {
     if (child.isMesh) {
       child.material.color.set(value);
     }
   });
-};
 
-init();
+  console.log("Changed color:", type, value);
+}
+
+/* ===============================
+   MODE
+================================= */
+function setMode(mode) {
+  stateManager.setMode(mode);
+  console.log("Mode:", mode);
+}
+
+/* ===============================
+   GENDER SWITCH
+================================= */
+function switchGender(gender) {
+  const normalized = gender.toLowerCase();
+  loadMannequin(normalized);
+}
+
+/* ===============================
+   GLOBAL UI EXPORT
+================================= */
+window.switchGender = switchGender;
+window.setMode = setMode;
+window.changeColor = changeColor;
+
+/* ===============================
+   GARMENT BUTTONS (OPTIONAL)
+================================= */
+window.loadTop01 = () => loadGarment("top", "top01.glb");
+window.loadTop02 = () => loadGarment("top", "top02.glb");
+window.loadBottom01 = () => loadGarment("bottom", "btm01.glb");
