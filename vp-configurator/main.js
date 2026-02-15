@@ -1,8 +1,8 @@
-import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
 import { StateManager } from "./core/StateManager.js";
+import * as THREE from "three";
 
 const loadingScreen = document.getElementById("loading-screen");
 
@@ -40,11 +40,12 @@ const garmentConfig = {
 };
 
 /* ===============================
-   INITIALIZE ENGINE
+   INIT ENGINE
 ================================= */
 
 async function init() {
   try {
+    console.log("Engine Init Started");
 
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
@@ -62,7 +63,6 @@ async function init() {
     }
 
     console.log("Engine initialized successfully");
-
   } catch (error) {
     console.error("Initialization failed:", error);
   }
@@ -71,40 +71,41 @@ async function init() {
 init();
 
 /* ===============================
-   AUTO CENTER FUNCTION
+   AUTO CENTER MODEL
 ================================= */
 
-function centerModel(model) {
+function autoCenterModel(model) {
   const box = new THREE.Box3().setFromObject(model);
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
 
-  model.position.x -= center.x;
-  model.position.y -= center.y;
-  model.position.z -= center.z;
+  model.position.sub(center);
 
   const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = sceneManager.camera.fov * (Math.PI / 180);
-  let cameraZ = Math.abs(maxDim / Math.sin(fov / 2));
+  const camera = sceneManager.camera;
 
-  sceneManager.camera.position.set(0, 0, cameraZ * 1.2);
-  sceneManager.camera.lookAt(0, 0, 0);
+  const fov = camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+  cameraZ *= 1.8;
 
-  sceneManager.controls.target.set(0, 0, 0);
-  sceneManager.controls.update();
+  camera.position.set(0, size.y * 0.4, cameraZ);
+  camera.lookAt(0, size.y * 0.4, 0);
+
+  console.log("Model auto-centered");
 }
 
 /* ===============================
-   MANNEQUIN LOADER
+   LOAD MANNEQUIN
 ================================= */
 
 async function loadMannequin(gender) {
   try {
-
     const path =
       gender === "women"
         ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
         : "/vp-configurator/assets/mannequin/men_mannequin.glb";
+
+    console.log("Loading mannequin:", path);
 
     if (currentMannequin) {
       sceneManager.scene.remove(currentMannequin);
@@ -112,15 +113,14 @@ async function loadMannequin(gender) {
 
     const mannequin = await modelLoader.loadModel(path);
 
+    autoCenterModel(mannequin);
+
     sceneManager.add(mannequin);
     currentMannequin = mannequin;
-
-    centerModel(mannequin);
 
     stateManager.setGender(gender);
 
     console.log("Loaded mannequin:", gender);
-
   } catch (error) {
     console.error("Mannequin load failed:", error);
   }
@@ -131,6 +131,7 @@ async function loadMannequin(gender) {
 ================================= */
 
 function populateSliders(gender) {
+  console.log("Populate sliders for:", gender);
 
   const config = garmentConfig[gender];
 
@@ -141,24 +142,32 @@ function populateSliders(gender) {
 }
 
 function populateCategory(category, items, gender) {
-
   const slider = document.getElementById(category + "-slider");
   if (!slider) return;
 
   slider.innerHTML = "";
 
-  items.forEach((name) => {
+  if (!items.length) {
+    console.log("No items for:", category);
+    return;
+  }
 
+  items.forEach((name) => {
     const card = document.createElement("div");
     card.className = "garment-card";
 
     const img = document.createElement("img");
     img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
 
+    console.log("Thumbnail path:", img.src);
+
+    img.onerror = () => {
+      console.error("Thumbnail failed:", img.src);
+    };
+
     card.appendChild(img);
 
     card.onclick = async () => {
-
       document
         .querySelectorAll(`#${category}-slider .garment-card`)
         .forEach((c) => c.classList.remove("active"));
@@ -173,27 +182,17 @@ function populateCategory(category, items, gender) {
 }
 
 /* ===============================
-   GARMENT LOADER (WITH FADE)
+   LOAD GARMENT
 ================================= */
 
 async function loadGarment(type, fileName) {
-
   try {
-
     const gender = stateManager.getState().gender;
     const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
     console.log("Loading garment:", path);
 
     const model = await modelLoader.loadModel(path);
-
-    // Fade-in animation
-    model.traverse(child => {
-      if (child.isMesh) {
-        child.material.transparent = true;
-        child.material.opacity = 0;
-      }
-    });
 
     if (garments[type]) {
       sceneManager.scene.remove(garments[type]);
@@ -202,54 +201,26 @@ async function loadGarment(type, fileName) {
     garments[type] = model;
     sceneManager.add(model);
 
-    // Animate fade in
-    fadeIn(model);
-
     console.log("Loaded garment:", type, fileName);
-
   } catch (error) {
     console.error("Garment load failed:", error);
   }
 }
 
 /* ===============================
-   FADE ANIMATION
-================================= */
-
-function fadeIn(object) {
-
-  let opacity = 0;
-
-  const interval = setInterval(() => {
-
-    opacity += 0.05;
-
-    object.traverse(child => {
-      if (child.isMesh) {
-        child.material.opacity = opacity;
-      }
-    });
-
-    if (opacity >= 1) {
-      clearInterval(interval);
-    }
-
-  }, 30);
-}
-
-/* ===============================
-   COLOR HANDLER
+   COLOR CHANGE
 ================================= */
 
 function changeColor(type, value) {
-
   if (!garments[type]) return;
 
-  garments[type].traverse(child => {
-    if (child.isMesh) {
+  garments[type].traverse((child) => {
+    if (child.isMesh && child.material) {
       child.material.color.set(value);
     }
   });
+
+  console.log("Color changed:", type, value);
 }
 
 /* ===============================
@@ -257,7 +228,6 @@ function changeColor(type, value) {
 ================================= */
 
 function setMode(mode) {
-
   const mix = document.getElementById("mix-section");
   const dress = document.getElementById("dress-section");
 
@@ -281,11 +251,13 @@ function setMode(mode) {
 ================================= */
 
 async function switchGender(gender) {
-
   const normalized = gender.toLowerCase();
+
+  console.log("Switch gender:", normalized);
 
   await loadMannequin(normalized);
 
+  // Clear garments
   Object.keys(garments).forEach((key) => {
     if (garments[key]) {
       sceneManager.scene.remove(garments[key]);
