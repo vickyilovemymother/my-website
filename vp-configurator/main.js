@@ -12,7 +12,6 @@ const modelLoader = new ModelLoader();
 const stateManager = new StateManager();
 
 let currentMannequin = null;
-let cameraDistance = 4;
 
 let garments = {
   top: null,
@@ -51,15 +50,15 @@ function fitCameraToModel(model) {
   const fov = sceneManager.camera.fov * (Math.PI / 180);
 
   let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-  cameraZ *= 1.5;
-
-  cameraDistance = cameraZ;
+  cameraZ *= 1.6;
 
   sceneManager.camera.position.set(center.x, center.y, cameraZ);
   sceneManager.camera.lookAt(center);
 
-  sceneManager.controls.target.copy(center);
-  sceneManager.controls.update();
+  if (sceneManager.controls) {
+    sceneManager.controls.target.copy(center);
+    sceneManager.controls.update();
+  }
 }
 
 /* ================= MANNEQUIN ================= */
@@ -86,7 +85,7 @@ async function loadMannequin(gender) {
   fitCameraToModel(mannequin);
 }
 
-/* ================= GARMENT CONFIG ================= */
+/* ================= GARMENTS ================= */
 
 const garmentConfig = {
   men: {
@@ -102,8 +101,6 @@ const garmentConfig = {
     dress: []
   }
 };
-
-/* ================= SLIDERS ================= */
 
 function populateSliders(gender) {
   const config = garmentConfig[gender];
@@ -143,8 +140,6 @@ function populateCategory(category, items, gender) {
   });
 }
 
-/* ================= LOAD GARMENT ================= */
-
 async function loadGarment(type, fileName) {
   const gender = stateManager.getState().gender;
   const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
@@ -168,7 +163,7 @@ async function loadGarment(type, fileName) {
   fadeIn(model);
 }
 
-/* ================= FADE ANIMATION ================= */
+/* ================= FADE ================= */
 
 function fadeIn(object) {
   let opacity = 0;
@@ -178,52 +173,81 @@ function fadeIn(object) {
 
     object.traverse((child) => {
       if (child.isMesh) {
-        child.material.opacity = Math.min(opacity, 1);
+        child.material.opacity = opacity;
       }
     });
 
-    if (opacity < 1) requestAnimationFrame(animate);
+    if (opacity < 1) {
+      requestAnimationFrame(animate);
+    }
   }
 
   animate();
 }
 
-/* ================= CAMERA SHORTCUTS ================= */
+/* ================= COLOR ================= */
+
+function changeColor(type, value) {
+  if (!garments[type]) return;
+
+  garments[type].traverse((child) => {
+    if (child.isMesh) {
+      child.material.color.set(value);
+    }
+  });
+}
+
+/* ================= MODE ================= */
+
+function setMode(mode) {
+  const mix = document.getElementById("mix-section");
+  const dress = document.getElementById("dress-section");
+
+  if (mode === "mix") {
+    mix.style.display = "block";
+    dress.style.display = "none";
+  } else {
+    mix.style.display = "none";
+    dress.style.display = "block";
+  }
+}
+
+/* ================= GENDER ================= */
+
+async function switchGender(gender) {
+  await loadMannequin(gender);
+
+  Object.keys(garments).forEach((key) => {
+    if (garments[key]) {
+      sceneManager.scene.remove(garments[key]);
+      garments[key] = null;
+    }
+  });
+
+  populateSliders(gender);
+}
+
+/* ================= SHORTCUTS ================= */
 
 window.addEventListener("keydown", (e) => {
   if (!currentMannequin) return;
 
-  const center = sceneManager.controls.target;
+  const distance = sceneManager.camera.position.length();
 
   switch (e.key) {
-    case "2":
-      sceneManager.camera.position.set(center.x, center.y, cameraDistance);
-      break;
-
-    case "8":
-      sceneManager.camera.position.set(center.x, center.y, -cameraDistance);
-      break;
-
-    case "4":
-      sceneManager.camera.position.set(-cameraDistance, center.y, center.z);
-      break;
-
-    case "6":
-      sceneManager.camera.position.set(cameraDistance, center.y, center.z);
-      break;
-
-    case "5":
-      sceneManager.camera.position.set(center.x, cameraDistance, center.z);
-      break;
-
-    case "0":
-      sceneManager.camera.position.set(center.x, -cameraDistance, center.z);
-      break;
+    case "2": moveCamera(0, 1.2, distance); break;
+    case "8": moveCamera(0, 1.2, -distance); break;
+    case "4": moveCamera(-distance, 1.2, 0); break;
+    case "6": moveCamera(distance, 1.2, 0); break;
+    case "5": moveCamera(0, distance, 0); break;
+    case "0": moveCamera(0, -distance, 0); break;
   }
-
-  sceneManager.camera.lookAt(center);
-  sceneManager.controls.update();
 });
+
+function moveCamera(x, y, z) {
+  sceneManager.camera.position.set(x, y, z);
+  sceneManager.camera.lookAt(0, 1.2, 0);
+}
 
 /* ================= HDR INTENSITY ================= */
 
@@ -270,33 +294,3 @@ window.exportImage = function () {
 window.switchGender = switchGender;
 window.setMode = setMode;
 window.changeColor = changeColor;
-
-/* ================= MODE ================= */
-
-function setMode(mode) {
-  const mix = document.getElementById("mix-section");
-  const dress = document.getElementById("dress-section");
-
-  if (mode === "mix") {
-    mix.style.display = "block";
-    dress.style.display = "none";
-  } else {
-    mix.style.display = "none";
-    dress.style.display = "block";
-  }
-}
-
-/* ================= GENDER ================= */
-
-async function switchGender(gender) {
-  await loadMannequin(gender);
-
-  Object.keys(garments).forEach((key) => {
-    if (garments[key]) {
-      sceneManager.scene.remove(garments[key]);
-      garments[key] = null;
-    }
-  });
-
-  populateSliders(gender);
-}
