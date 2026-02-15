@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export class SceneManager {
   constructor() {
@@ -48,6 +48,10 @@ export class SceneManager {
 
   add(object) {
     this.scene.add(object);
+  }
+
+  remove(object) {
+    this.scene.remove(object);
   }
 
   start() {
