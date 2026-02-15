@@ -1,8 +1,8 @@
+import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
 import { StateManager } from "./core/StateManager.js";
-import * as THREE from "three";
 
 const loadingScreen = document.getElementById("loading-screen");
 
@@ -20,9 +20,9 @@ let garments = {
   dress: null
 };
 
-/* ===============================
-   GARMENT CONFIG
-================================= */
+/* =====================================================
+   GARMENT CONFIG (LOWERCASE ONLY)
+===================================================== */
 
 const garmentConfig = {
   men: {
@@ -39,14 +39,12 @@ const garmentConfig = {
   }
 };
 
-/* ===============================
-   INIT ENGINE
-================================= */
+/* =====================================================
+   INIT
+===================================================== */
 
 async function init() {
   try {
-    console.log("Engine Init Started");
-
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
     );
@@ -58,9 +56,7 @@ async function init() {
     populateSliders("men");
     setMode("mix");
 
-    if (loadingScreen) {
-      loadingScreen.style.display = "none";
-    }
+    if (loadingScreen) loadingScreen.style.display = "none";
 
     console.log("Engine initialized successfully");
   } catch (error) {
@@ -70,33 +66,10 @@ async function init() {
 
 init();
 
-/* ===============================
-   AUTO CENTER MODEL
-================================= */
-
-function autoCenterModel(model) {
-  const box = new THREE.Box3().setFromObject(model);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-
-  model.position.sub(center);
-
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const camera = sceneManager.camera;
-
-  const fov = camera.fov * (Math.PI / 180);
-  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-  cameraZ *= 1.8;
-
-  camera.position.set(0, size.y * 0.4, cameraZ);
-  camera.lookAt(0, size.y * 0.4, 0);
-
-  console.log("Model auto-centered");
-}
-
-/* ===============================
-   LOAD MANNEQUIN
-================================= */
+/* =====================================================
+   MANNEQUIN LOADER
+   (Camera framed, mannequin untouched)
+===================================================== */
 
 async function loadMannequin(gender) {
   try {
@@ -105,20 +78,18 @@ async function loadMannequin(gender) {
         ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
         : "/vp-configurator/assets/mannequin/men_mannequin.glb";
 
-    console.log("Loading mannequin:", path);
-
     if (currentMannequin) {
       sceneManager.scene.remove(currentMannequin);
     }
 
     const mannequin = await modelLoader.loadModel(path);
 
-    autoCenterModel(mannequin);
-
     sceneManager.add(mannequin);
     currentMannequin = mannequin;
 
     stateManager.setGender(gender);
+
+    autoFrameModel(mannequin);
 
     console.log("Loaded mannequin:", gender);
   } catch (error) {
@@ -126,13 +97,33 @@ async function loadMannequin(gender) {
   }
 }
 
-/* ===============================
-   POPULATE SLIDERS
-================================= */
+/* =====================================================
+   AUTO CAMERA FRAME (DO NOT MOVE MANNEQUIN)
+===================================================== */
+
+function autoFrameModel(model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+
+  const camera = sceneManager.camera;
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = camera.fov * (Math.PI / 180);
+
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+  cameraZ *= 1.6;
+
+  camera.position.set(0, size.y * 0.5, cameraZ);
+  camera.lookAt(0, size.y * 0.5, 0);
+
+  console.log("Camera framed only (mannequin untouched)");
+}
+
+/* =====================================================
+   SLIDER POPULATION
+===================================================== */
 
 function populateSliders(gender) {
-  console.log("Populate sliders for:", gender);
-
   const config = garmentConfig[gender];
 
   populateCategory("top", config.top, gender);
@@ -147,8 +138,11 @@ function populateCategory(category, items, gender) {
 
   slider.innerHTML = "";
 
-  if (!items.length) {
-    console.log("No items for:", category);
+  console.log("Populating", category, items);
+
+  if (!items || items.length === 0) {
+    slider.innerHTML =
+      '<div style="font-size:11px;color:#666;">No items</div>';
     return;
   }
 
@@ -159,10 +153,8 @@ function populateCategory(category, items, gender) {
     const img = document.createElement("img");
     img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
 
-    console.log("Thumbnail path:", img.src);
-
     img.onerror = () => {
-      console.error("Thumbnail failed:", img.src);
+      console.warn("Missing thumbnail:", img.src);
     };
 
     card.appendChild(img);
@@ -181,13 +173,14 @@ function populateCategory(category, items, gender) {
   });
 }
 
-/* ===============================
-   LOAD GARMENT
-================================= */
+/* =====================================================
+   GARMENT LOADER
+===================================================== */
 
 async function loadGarment(type, fileName) {
   try {
     const gender = stateManager.getState().gender;
+
     const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
     console.log("Loading garment:", path);
@@ -199,6 +192,7 @@ async function loadGarment(type, fileName) {
     }
 
     garments[type] = model;
+
     sceneManager.add(model);
 
     console.log("Loaded garment:", type, fileName);
@@ -207,9 +201,9 @@ async function loadGarment(type, fileName) {
   }
 }
 
-/* ===============================
-   COLOR CHANGE
-================================= */
+/* =====================================================
+   COLOR HANDLER
+===================================================== */
 
 function changeColor(type, value) {
   if (!garments[type]) return;
@@ -223,9 +217,9 @@ function changeColor(type, value) {
   console.log("Color changed:", type, value);
 }
 
-/* ===============================
+/* =====================================================
    MODE CONTROL
-================================= */
+===================================================== */
 
 function setMode(mode) {
   const mix = document.getElementById("mix-section");
@@ -246,14 +240,12 @@ function setMode(mode) {
   console.log("Mode:", mode);
 }
 
-/* ===============================
+/* =====================================================
    GENDER SWITCH
-================================= */
+===================================================== */
 
 async function switchGender(gender) {
   const normalized = gender.toLowerCase();
-
-  console.log("Switch gender:", normalized);
 
   await loadMannequin(normalized);
 
@@ -266,11 +258,13 @@ async function switchGender(gender) {
   });
 
   populateSliders(normalized);
+
+  console.log("Gender switched:", normalized);
 }
 
-/* ===============================
+/* =====================================================
    GLOBAL EXPORT
-================================= */
+===================================================== */
 
 window.switchGender = switchGender;
 window.setMode = setMode;
