@@ -27,8 +27,8 @@ const garmentConfig = {
   men: {
     top: ["top01", "top02"],
     bottom: ["btm01"],
-    jacket: ["jkt01"],
-    dress: ["comboset01.png"]
+    jacket: [],
+    dress: []
   },
   women: {
     top: ["top01"],
