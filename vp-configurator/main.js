@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
@@ -44,6 +45,7 @@ const garmentConfig = {
 
 async function init() {
   try {
+
     await environmentManager.loadHDR(
       "/vp-configurator/assets/hdr/hc_vp.hdr"
     );
@@ -60,6 +62,7 @@ async function init() {
     }
 
     console.log("Engine initialized successfully");
+
   } catch (error) {
     console.error("Initialization failed:", error);
   }
@@ -68,11 +71,36 @@ async function init() {
 init();
 
 /* ===============================
+   AUTO CENTER FUNCTION
+================================= */
+
+function centerModel(model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+
+  model.position.x -= center.x;
+  model.position.y -= center.y;
+  model.position.z -= center.z;
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = sceneManager.camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / Math.sin(fov / 2));
+
+  sceneManager.camera.position.set(0, 0, cameraZ * 1.2);
+  sceneManager.camera.lookAt(0, 0, 0);
+
+  sceneManager.controls.target.set(0, 0, 0);
+  sceneManager.controls.update();
+}
+
+/* ===============================
    MANNEQUIN LOADER
 ================================= */
 
 async function loadMannequin(gender) {
   try {
+
     const path =
       gender === "women"
         ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
@@ -87,9 +115,12 @@ async function loadMannequin(gender) {
     sceneManager.add(mannequin);
     currentMannequin = mannequin;
 
+    centerModel(mannequin);
+
     stateManager.setGender(gender);
 
     console.log("Loaded mannequin:", gender);
+
   } catch (error) {
     console.error("Mannequin load failed:", error);
   }
@@ -100,6 +131,7 @@ async function loadMannequin(gender) {
 ================================= */
 
 function populateSliders(gender) {
+
   const config = garmentConfig[gender];
 
   populateCategory("top", config.top, gender);
@@ -109,12 +141,14 @@ function populateSliders(gender) {
 }
 
 function populateCategory(category, items, gender) {
+
   const slider = document.getElementById(category + "-slider");
   if (!slider) return;
 
   slider.innerHTML = "";
 
   items.forEach((name) => {
+
     const card = document.createElement("div");
     card.className = "garment-card";
 
@@ -124,6 +158,7 @@ function populateCategory(category, items, gender) {
     card.appendChild(img);
 
     card.onclick = async () => {
+
       document
         .querySelectorAll(`#${category}-slider .garment-card`)
         .forEach((c) => c.classList.remove("active"));
@@ -138,28 +173,68 @@ function populateCategory(category, items, gender) {
 }
 
 /* ===============================
-   GARMENT LOADER
+   GARMENT LOADER (WITH FADE)
 ================================= */
 
 async function loadGarment(type, fileName) {
+
   try {
+
     const gender = stateManager.getState().gender;
     const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
 
+    console.log("Loading garment:", path);
+
     const model = await modelLoader.loadModel(path);
+
+    // Fade-in animation
+    model.traverse(child => {
+      if (child.isMesh) {
+        child.material.transparent = true;
+        child.material.opacity = 0;
+      }
+    });
 
     if (garments[type]) {
       sceneManager.scene.remove(garments[type]);
     }
 
     garments[type] = model;
-
     sceneManager.add(model);
 
+    // Animate fade in
+    fadeIn(model);
+
     console.log("Loaded garment:", type, fileName);
+
   } catch (error) {
     console.error("Garment load failed:", error);
   }
+}
+
+/* ===============================
+   FADE ANIMATION
+================================= */
+
+function fadeIn(object) {
+
+  let opacity = 0;
+
+  const interval = setInterval(() => {
+
+    opacity += 0.05;
+
+    object.traverse(child => {
+      if (child.isMesh) {
+        child.material.opacity = opacity;
+      }
+    });
+
+    if (opacity >= 1) {
+      clearInterval(interval);
+    }
+
+  }, 30);
 }
 
 /* ===============================
@@ -167,9 +242,10 @@ async function loadGarment(type, fileName) {
 ================================= */
 
 function changeColor(type, value) {
+
   if (!garments[type]) return;
 
-  garments[type].traverse((child) => {
+  garments[type].traverse(child => {
     if (child.isMesh) {
       child.material.color.set(value);
     }
@@ -181,6 +257,7 @@ function changeColor(type, value) {
 ================================= */
 
 function setMode(mode) {
+
   const mix = document.getElementById("mix-section");
   const dress = document.getElementById("dress-section");
 
@@ -204,11 +281,11 @@ function setMode(mode) {
 ================================= */
 
 async function switchGender(gender) {
+
   const normalized = gender.toLowerCase();
 
   await loadMannequin(normalized);
 
-  // Clear existing garments
   Object.keys(garments).forEach((key) => {
     if (garments[key]) {
       sceneManager.scene.remove(garments[key]);
