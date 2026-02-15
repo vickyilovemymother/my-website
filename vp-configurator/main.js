@@ -300,3 +300,6 @@ async function switchGender(gender) {
 
   populateSliders(gender);
 }
+window.exportImage = exportImage;
+window.changeColor = changeColor;
+
