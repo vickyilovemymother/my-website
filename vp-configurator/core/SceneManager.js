@@ -1,19 +1,26 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export class SceneManager {
+
   constructor() {
+
     this.container = document.getElementById("vp-canvas");
 
     if (!this.container) {
-      throw new Error("vp-canvas not found");
+      throw new Error("vp-canvas container not found.");
     }
 
+    /* ============================= */
     /* SCENE */
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color("#000000");
+    /* ============================= */
 
+    this.scene = new THREE.Scene();
+
+    /* ============================= */
     /* CAMERA */
+    /* ============================= */
+
     this.camera = new THREE.PerspectiveCamera(
       45,
       this.container.clientWidth / this.container.clientHeight,
@@ -23,7 +30,10 @@ export class SceneManager {
 
     this.camera.position.set(0, 1.5, 4);
 
+    /* ============================= */
     /* RENDERER */
+    /* ============================= */
+
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -41,16 +51,22 @@ export class SceneManager {
 
     this.container.appendChild(this.renderer.domElement);
 
+    /* ============================= */
     /* CONTROLS */
+    /* ============================= */
+
     this.controls = new OrbitControls(
       this.camera,
       this.renderer.domElement
     );
 
     this.controls.enableDamping = true;
-    this.controls.target.set(0, 1, 0);
+    this.controls.dampingFactor = 0.05;
 
-    /* RESIZE */
+    /* ============================= */
+    /* RESIZE HANDLER */
+    /* ============================= */
+
     window.addEventListener("resize", () => this.onResize());
   }
 
@@ -79,4 +95,5 @@ export class SceneManager {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   }
+
 }
