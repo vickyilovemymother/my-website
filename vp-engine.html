@@ -1,160 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VP Configurator Engine</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VP Configurator Engine</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root{
-    --bg:#050505;
-    --accent:#00f2ea;
-    --panel:rgba(15,15,15,0.9);
-}
+  <style>
+    :root{
+      --bg:#050505;
+      --accent:#00f2ea;
+      --panel:rgba(15,15,15,0.9);
+    }
 
-*{margin:0;padding:0;box-sizing:border-box;}
+    *{margin:0;padding:0;box-sizing:border-box;}
 
-body{
-    background:var(--bg);
-    font-family:'Inter',sans-serif;
-    color:#fff;
-    overflow:hidden;
-}
+    body{
+      background:var(--bg);
+      font-family:'Inter',sans-serif;
+      color:#fff;
+      overflow:hidden;
+    }
 
-/* ===== TOP BAR ===== */
-.top-bar{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:70px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 40px;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-    background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(15px);
-    z-index:20;
-}
+    /* ===== TOP BAR ===== */
+    .top-bar{
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:70px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 40px;
+      border-bottom:1px solid rgba(255,255,255,0.1);
+      background:rgba(0,0,0,0.6);
+      backdrop-filter:blur(15px);
+      z-index:20;
+    }
 
-.top-title{
-    font-family:'Space Grotesk';
-    font-size:18px;
-    letter-spacing:1px;
-}
+    .top-title{
+      font-family:'Space Grotesk';
+      font-size:18px;
+      letter-spacing:1px;
+    }
 
-.back-btn{
-    color:#aaa;
-    text-decoration:none;
-    border:1px solid rgba(255,255,255,0.2);
-    padding:8px 18px;
-    border-radius:6px;
-    transition:0.3s;
-}
+    .back-btn{
+      color:#aaa;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,0.2);
+      padding:8px 18px;
+      border-radius:6px;
+      transition:0.3s;
+    }
 
-.back-btn:hover{
-    border-color:var(--accent);
-    color:var(--accent);
-}
+    .back-btn:hover{
+      border-color:var(--accent);
+      color:var(--accent);
+    }
 
-/* ===== PANELS ===== */
-.panel{
-    position:absolute;
-    top:70px;
-    width:260px;
-    height:calc(100% - 70px);
-    background:var(--panel);
-    backdrop-filter:blur(20px);
-    padding:25px;
-    z-index:15;
-    overflow-y:auto;
-}
+    /* ===== PANELS ===== */
+    .panel{
+      position:absolute;
+      top:70px;
+      width:260px;
+      height:calc(100% - 70px);
+      background:var(--panel);
+      backdrop-filter:blur(20px);
+      padding:25px;
+      z-index:15;
+    }
 
-.left-panel{
-    left:0;
-    border-right:1px solid rgba(255,255,255,0.1);
-}
+    .left-panel{
+      left:0;
+      border-right:1px solid rgba(255,255,255,0.1);
+    }
 
-.right-panel{
-    right:0;
-    border-left:1px solid rgba(255,255,255,0.1);
-}
+    .right-panel{
+      right:0;
+      border-left:1px solid rgba(255,255,255,0.1);
+    }
 
-.panel h4{
-    margin:20px 0 10px;
-    font-family:'Space Grotesk';
-}
+    .panel h4{
+      margin:20px 0 10px;
+      font-family:'Space Grotesk';
+    }
 
-.panel button{
-    width:100%;
-    margin-bottom:8px;
-    padding:8px;
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.2);
-    color:#aaa;
-    border-radius:6px;
-    cursor:pointer;
-    transition:0.3s;
-    font-size:12px;
-}
+    .panel button{
+      width:100%;
+      margin-bottom:10px;
+      padding:8px;
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.2);
+      color:#aaa;
+      border-radius:6px;
+      cursor:pointer;
+      transition:0.3s;
+    }
 
-.panel button:hover{
-    border-color:var(--accent);
-    color:var(--accent);
-    background:rgba(0,242,234,0.05);
-}
+    .panel button:hover{
+      border-color:var(--accent);
+      color:var(--accent);
+      background:rgba(0,242,234,0.05);
+    }
 
-/* ===== CANVAS ===== */
-#vp-canvas{
-    position:absolute;
-    top:70px;
-    left:260px;
-    right:260px;
-    bottom:0;
-}
+    /* ===== CANVAS ===== */
+    #vp-canvas{
+      position:absolute;
+      top:70px;
+      left:260px;
+      right:260px;
+      bottom:0;
+    }
 
-/* ===== LOADING ===== */
-#loading-screen{
-    position:absolute;
-    inset:0;
-    background:#000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Space Grotesk';
-    letter-spacing:2px;
-    font-size:14px;
-    z-index:100;
-}
-</style>
+    /* ===== LOADING ===== */
+    #loading-screen{
+      position:absolute;
+      inset:0;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Space Grotesk';
+      letter-spacing:2px;
+      font-size:14px;
+      z-index:100;
+    }
+  </style>
 
-<!-- IMPORT MAP -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  <!-- IMPORT MAP (MUST BE BEFORE MODULE SCRIPT) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
   }
-}
-</script>
-
+  </script>
 </head>
+
 <body>
 
-<div id="loading-screen">Initializing VP Configurator Engine...</div>
+  <div id="loading-screen">Initializing VP Configurator Engine...</div>
 
-<div class="top-bar">
+  <div class="top-bar">
     <a href="portfolio.html" class="back-btn">← Back</a>
     <div class="top-title">VP Configurator Engine</div>
-    <div style="color:var(--accent); font-size:12px;">READY</div>
-</div>
+    <div id="status-indicator" style="color:var(--accent); font-size:12px;">READY</div>
+  </div>
 
-<!-- LEFT PANEL -->
-<div class="panel left-panel">
-
+  <div class="panel left-panel">
     <h4>Gender</h4>
     <button onclick="switchGender('Men')">Men</button>
     <button onclick="switchGender('Women')">Women</button>
@@ -162,26 +158,20 @@ body{
     <h4>Mode</h4>
     <button onclick="setMode('mix')">Mix & Match</button>
     <button onclick="setMode('dress')">Dress Mode</button>
+  </div>
 
-    <h4>Top</h4>
-    <div id="top-container"></div>
-
-    <h4>Bottom</h4>
-    <div id="bottom-container"></div>
-
-</div>
-
-<!-- RIGHT PANEL -->
-<div class="panel right-panel">
+  <div class="panel right-panel">
     <h4>Color</h4>
     <input type="color" onchange="changeColor('top', this.value)">
     <input type="color" onchange="changeColor('bottom', this.value)">
-</div>
+    <input type="color" onchange="changeColor('jacket', this.value)">
+    <input type="color" onchange="changeColor('dress', this.value)">
+  </div>
 
-<div id="vp-canvas"></div>
+  <div id="vp-canvas"></div>
 
-<!-- MAIN SCRIPT -->
-<script type="module" src="./vp-configurator/main.js"></script>
+  <!-- MAIN THREE MODULE -->
+  <script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
 </html>
