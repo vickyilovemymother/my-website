@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>VP Configurator Engine</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -61,7 +61,6 @@ body{
 }
 
 /* ===== PANELS ===== */
-
 .panel{
     position:absolute;
     top:70px;
@@ -70,28 +69,28 @@ body{
     background:var(--panel);
     backdrop-filter:blur(20px);
     padding:25px;
-    border-right:1px solid rgba(255,255,255,0.1);
     z-index:15;
-}
-
-.right-panel{
-    right:0;
-    border-right:none;
-    border-left:1px solid rgba(255,255,255,0.1);
+    overflow-y:auto;
 }
 
 .left-panel{
     left:0;
+    border-right:1px solid rgba(255,255,255,0.1);
+}
+
+.right-panel{
+    right:0;
+    border-left:1px solid rgba(255,255,255,0.1);
 }
 
 .panel h4{
-    margin-bottom:15px;
+    margin:20px 0 10px;
     font-family:'Space Grotesk';
 }
 
 .panel button{
     width:100%;
-    margin-bottom:10px;
+    margin-bottom:8px;
     padding:8px;
     background:transparent;
     border:1px solid rgba(255,255,255,0.2);
@@ -99,6 +98,7 @@ body{
     border-radius:6px;
     cursor:pointer;
     transition:0.3s;
+    font-size:12px;
 }
 
 .panel button:hover{
@@ -108,7 +108,6 @@ body{
 }
 
 /* ===== CANVAS ===== */
-
 #vp-canvas{
     position:absolute;
     top:70px;
@@ -117,7 +116,7 @@ body{
     bottom:0;
 }
 
-/* Loading */
+/* ===== LOADING ===== */
 #loading-screen{
     position:absolute;
     inset:0;
@@ -131,51 +130,8 @@ body{
     z-index:100;
 }
 </style>
-</head>
-<body>
 
-<div id="loading-screen">
-    Initializing VP Configurator Engine...
-</div>
-
-<div class="top-bar">
-    <a href="portfolio.html" class="back-btn">← Back</a>
-    <div class="top-title">VP Configurator Engine</div>
-    <div id="status-indicator" style="color:var(--accent); font-size:12px;">READY</div>
-</div>
-
-<div class="panel left-panel">
-    <h4>Gender</h4>
-    <button onclick="switchGender('Men')">Men</button>
-    <button onclick="switchGender('Women')">Women</button>
-
-    <h4 style="margin-top:25px;">Mode</h4>
-    <button onclick="setMode('mix')">Mix & Match</button>
-    <button onclick="setMode('dress')">Dress Mode</button>
-</div>
-
-<div class="panel right-panel">
-    <h4>Color</h4>
-    <input type="color" onchange="changeColor('top', this.value)">
-    <input type="color" onchange="changeColor('bottom', this.value)">
-    <input type="color" onchange="changeColor('jacket', this.value)">
-    <input type="color" onchange="changeColor('dress', this.value)">
-</div>
-
-<div id="vp-canvas"></div>
-
-<!-- THREE CORE -->
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-
-<!-- THREE EXAMPLES -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/DRACOLoader.js"></script>
-<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/RGBELoader.js"></script>
-
-<!-- YOUR ENGINE -->
-<script src="./vp-configurator/engine.js"></script>
-
+<!-- IMPORT MAP -->
 <script type="importmap">
 {
   "imports": {
@@ -185,6 +141,46 @@ body{
 }
 </script>
 
+</head>
+<body>
+
+<div id="loading-screen">Initializing VP Configurator Engine...</div>
+
+<div class="top-bar">
+    <a href="portfolio.html" class="back-btn">← Back</a>
+    <div class="top-title">VP Configurator Engine</div>
+    <div style="color:var(--accent); font-size:12px;">READY</div>
+</div>
+
+<!-- LEFT PANEL -->
+<div class="panel left-panel">
+
+    <h4>Gender</h4>
+    <button onclick="switchGender('Men')">Men</button>
+    <button onclick="switchGender('Women')">Women</button>
+
+    <h4>Mode</h4>
+    <button onclick="setMode('mix')">Mix & Match</button>
+    <button onclick="setMode('dress')">Dress Mode</button>
+
+    <h4>Top</h4>
+    <div id="top-container"></div>
+
+    <h4>Bottom</h4>
+    <div id="bottom-container"></div>
+
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="panel right-panel">
+    <h4>Color</h4>
+    <input type="color" onchange="changeColor('top', this.value)">
+    <input type="color" onchange="changeColor('bottom', this.value)">
+</div>
+
+<div id="vp-canvas"></div>
+
+<!-- MAIN SCRIPT -->
 <script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
