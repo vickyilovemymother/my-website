@@ -156,20 +156,37 @@ body{
 <div class="panel left-panel">
 
     <h4>Gender</h4>
-    <button onclick="switchGender('Men')">Men</button>
-    <button onclick="switchGender('Women')">Women</button>
+    <button onclick="switchGender('men')">Men</button>
+    <button onclick="switchGender('women')">Women</button>
 
     <h4>Mode</h4>
     <button onclick="setMode('mix')">Mix & Match</button>
     <button onclick="setMode('dress')">Dress Mode</button>
 
-    <h4>Top</h4>
-    <div id="top-container"></div>
+    <!-- MIX & MATCH SECTION -->
+    <div id="mix-section" style="display:none;">
 
-    <h4>Bottom</h4>
-    <div id="bottom-container"></div>
+        <h4>Top</h4>
+        <div class="slider" id="top-slider"></div>
+
+        <h4>Bottom</h4>
+        <div class="slider" id="bottom-slider"></div>
+
+        <h4>Jacket</h4>
+        <div class="slider" id="jacket-slider"></div>
+
+    </div>
+
+    <!-- DRESS SECTION -->
+    <div id="dress-section" style="display:none;">
+
+        <h4>Dress</h4>
+        <div class="slider" id="dress-slider"></div>
+
+    </div>
 
 </div>
+
 
 <!-- RIGHT PANEL -->
 <div class="panel right-panel">
@@ -185,3 +202,4 @@ body{
 
 </body>
 </html>
+
