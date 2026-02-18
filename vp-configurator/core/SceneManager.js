@@ -1,13 +1,10 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 export class SceneManager {
   constructor() {
     this.container = document.getElementById("vp-canvas");
-
-    if (!this.container) {
-      throw new Error("vp-canvas container not found.");
-    }
+    if (!this.container) throw new Error("vp-canvas container not found");
 
     this.scene = new THREE.Scene();
 
@@ -22,21 +19,20 @@ export class SceneManager {
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: false
+      alpha: true
     });
 
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(
       this.container.clientWidth,
       this.container.clientHeight
     );
 
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.container.appendChild(this.renderer.domElement);
 
