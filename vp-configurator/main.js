@@ -2,186 +2,196 @@ import * as THREE from "three";
 import { SceneManager } from "./core/SceneManager.js";
 import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
+import { StateManager } from "./core/StateManager.js";
 
 const sceneManager = new SceneManager();
 const environmentManager = new EnvironmentManager(sceneManager);
 const modelLoader = new ModelLoader();
+const stateManager = new StateManager();
 
-let mannequin;
-let garments = {};
-let spinEnabled = false;
-let hdrVisible = true;
-let shadowVisible = true;
-let performanceMode = false;
+let currentMannequin = null;
+
+let garments = {
+  top: null,
+  bottom: null,
+  jacket: null,
+  dress: null
+};
 
 /* ================= INIT ================= */
 
 async function init() {
-  await environmentManager.loadHDR("/vp-configurator/assets/hdr/hc_vp.hdr");
-  await loadMannequin();
-  addGroundShadow();
+  await environmentManager.loadHDR(
+    "/vp-configurator/assets/hdr/hc_vp.hdr"
+  );
+
+  await loadMannequin("men");
+
+  populateSliders("men");
+  setMode("mix");
+
   sceneManager.start();
 }
+
 init();
 
 /* ================= MANNEQUIN ================= */
 
-async function loadMannequin() {
-  mannequin = await modelLoader.loadModel("/vp-configurator/assets/mannequin/men_mannequin.glb");
+async function loadMannequin(gender) {
+  const path =
+    gender === "women"
+      ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
+      : "/vp-configurator/assets/mannequin/men_mannequin.glb";
+
+  if (currentMannequin) sceneManager.remove(currentMannequin);
+
+  const mannequin = await modelLoader.loadModel(path);
+
+  mannequin.position.set(0, 0, 0);
+
   sceneManager.add(mannequin);
-  fitCamera();
+  currentMannequin = mannequin;
+
+  sceneManager.fitCameraToObject(mannequin);
+
+  stateManager.setGender(gender);
 }
 
-/* ================= CAMERA ================= */
+/* ================= GARMENTS ================= */
 
-function fitCamera() {
-  const box = new THREE.Box3().setFromObject(mannequin);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  const maxDim = Math.max(size.x, size.y, size.z);
+const garmentConfig = {
+  men: {
+    top: ["top01", "top02"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  },
+  women: {
+    top: ["top01"],
+    bottom: ["btm01"],
+    jacket: [],
+    dress: []
+  }
+};
 
-  const fov = sceneManager.camera.fov * (Math.PI/180);
-  let distance = Math.abs(maxDim / Math.sin(fov/2)) * 0.6;
+function populateSliders(gender) {
+  const config = garmentConfig[gender];
 
-  sceneManager.camera.position.set(0, size.y*0.6, distance);
-  sceneManager.camera.lookAt(center);
-}
+  Object.keys(config).forEach((category) => {
+    const slider = document.getElementById(category + "-slider");
+    if (!slider) return;
 
-window.addEventListener("keydown", (e)=>{
-  const dist = sceneManager.camera.position.length();
-  if(e.key==="2") moveCam(0,1.5,dist);
-  if(e.key==="8") moveCam(0,1.5,-dist);
-  if(e.key==="4") moveCam(-dist,1.5,0);
-  if(e.key==="6") moveCam(dist,1.5,0);
-});
+    slider.innerHTML = "";
 
-function moveCam(x,y,z){
-  gsap.to(sceneManager.camera.position,{
-    duration:0.8,
-    x,y,z,
-    onUpdate:()=>sceneManager.camera.lookAt(0,1,0)
+    config[category].forEach((name) => {
+      const card = document.createElement("div");
+      card.className = "garment-card";
+
+      const img = document.createElement("img");
+      img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
+
+      card.appendChild(img);
+
+      card.onclick = async () => {
+        await loadGarment(category, name + ".glb");
+      };
+
+      slider.appendChild(card);
+    });
   });
+}
+
+async function loadGarment(type, fileName) {
+  const gender = stateManager.getState().gender;
+  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
+
+  const model = await modelLoader.loadModel(path);
+
+  if (garments[type]) sceneManager.remove(garments[type]);
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.material.transparent = true;
+      child.material.opacity = 0;
+    }
+  });
+
+  garments[type] = model;
+  sceneManager.add(model);
+
+  fadeIn(model);
 }
 
 /* ================= FADE ================= */
 
-function fadeIn(obj){
-  obj.traverse(c=>{
-    if(c.isMesh){
-      c.material.transparent=true;
-      c.material.opacity=0;
-    }
-  });
+function fadeIn(object) {
+  let opacity = 0;
 
-  let opacity=0;
-  function animate(){
-    opacity+=0.05;
-    obj.traverse(c=>{
-      if(c.isMesh) c.material.opacity=opacity;
+  function animate() {
+    opacity += 0.05;
+
+    object.traverse((child) => {
+      if (child.isMesh) child.material.opacity = opacity;
     });
-    if(opacity<1) requestAnimationFrame(animate);
+
+    if (opacity < 1) requestAnimationFrame(animate);
   }
+
   animate();
 }
 
-/* ================= HDR ================= */
+/* ================= COLOR ================= */
 
-document.getElementById("hdrIntensity").addEventListener("input",(e)=>{
-  const val=parseFloat(e.target.value);
-  sceneManager.scene.traverse(obj=>{
-    if(obj.isMesh && obj.material.envMapIntensity!==undefined){
-      obj.material.envMapIntensity=val;
+function changeColor(type, value) {
+  if (!garments[type]) return;
+
+  garments[type].traverse((child) => {
+    if (child.isMesh) child.material.color.set(value);
+  });
+}
+
+window.changeColor = changeColor;
+
+/* ================= MODE ================= */
+
+function setMode(mode) {
+  const mix = document.getElementById("mix-section");
+  const dress = document.getElementById("dress-section");
+
+  mix.style.display = mode === "mix" ? "block" : "none";
+  dress.style.display = mode === "dress" ? "block" : "none";
+}
+
+window.setMode = setMode;
+
+/* ================= GENDER ================= */
+
+async function switchGender(gender) {
+  await loadMannequin(gender);
+
+  Object.keys(garments).forEach((key) => {
+    if (garments[key]) {
+      sceneManager.remove(garments[key]);
+      garments[key] = null;
     }
   });
-});
 
-window.toggleHDR=()=>{
-  hdrVisible=!hdrVisible;
-  sceneManager.scene.environment = hdrVisible ? environmentManager.hdrTexture : null;
-};
-
-/* ================= BACKGROUND ================= */
-
-document.getElementById("bgColorPicker").addEventListener("input",(e)=>{
-  sceneManager.renderer.setClearColor(e.target.value);
-});
-
-/* ================= SHADOW ================= */
-
-function addGroundShadow(){
-  const geo=new THREE.PlaneGeometry(10,10);
-  const mat=new THREE.ShadowMaterial({opacity:0.3});
-  const plane=new THREE.Mesh(geo,mat);
-  plane.rotation.x=-Math.PI/2;
-  plane.position.y=0;
-  plane.receiveShadow=true;
-  plane.name="groundShadow";
-  sceneManager.scene.add(plane);
+  populateSliders(gender);
 }
 
-window.toggleShadow=()=>{
-  shadowVisible=!shadowVisible;
-  const shadow=sceneManager.scene.getObjectByName("groundShadow");
-  if(shadow) shadow.visible=shadowVisible;
-};
+window.switchGender = switchGender;
 
-/* ================= SPIN ================= */
+/* ================= CAMERA SHORTCUTS ================= */
 
-window.toggleSpin=()=>{
-  spinEnabled=!spinEnabled;
-};
+window.addEventListener("keydown", (e) => {
+  if (!currentMannequin) return;
 
-function spinLoop(){
-  if(spinEnabled){
-    mannequin.rotation.y+=0.01;
+  const dist = sceneManager.camera.position.length();
+
+  switch (e.key) {
+    case "2": sceneManager.smoothMoveCamera(0, 1.2, dist); break;
+    case "8": sceneManager.smoothMoveCamera(0, 1.2, -dist); break;
+    case "4": sceneManager.smoothMoveCamera(-dist, 1.2, 0); break;
+    case "6": sceneManager.smoothMoveCamera(dist, 1.2, 0); break;
   }
-  requestAnimationFrame(spinLoop);
-}
-spinLoop();
-
-/* ================= EXPORT ================= */
-
-window.exportPNG=(transparent=false)=>{
-  const w=parseInt(document.getElementById("exportWidth").value)||2048;
-  const h=parseInt(document.getElementById("exportHeight").value)||2048;
-
-  const oldSize=sceneManager.renderer.getSize(new THREE.Vector2());
-
-  if(transparent) sceneManager.renderer.setClearColor(0x000000,0);
-
-  sceneManager.renderer.setSize(w,h);
-  sceneManager.renderer.render(sceneManager.scene,sceneManager.camera);
-
-  const dataURL=sceneManager.renderer.domElement.toDataURL("image/png");
-
-  const link=document.createElement("a");
-  link.href=dataURL;
-  link.download="vp_render.png";
-  link.click();
-
-  sceneManager.renderer.setSize(oldSize.x,oldSize.y);
-};
-
-window.exportGIF=()=>{
-  alert("GIF export pipeline ready — connect GIF encoder like gif.js for production.");
-};
-
-/* ================= PRESET ================= */
-
-window.savePreset=()=>{
-  const preset={
-    spin:spinEnabled
-  };
-  localStorage.setItem("vpPreset",JSON.stringify(preset));
-};
-
-window.loadPreset=()=>{
-  const preset=JSON.parse(localStorage.getItem("vpPreset"));
-  if(!preset) return;
-  spinEnabled=preset.spin;
-};
-
-window.togglePerformance=()=>{
-  performanceMode=!performanceMode;
-  sceneManager.renderer.setPixelRatio(performanceMode?1:window.devicePixelRatio);
-};
+});
