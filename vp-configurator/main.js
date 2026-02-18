@@ -79,6 +79,8 @@ async function loadMannequin(gender) {
 
   sceneManager.add(mannequin);
   currentMannequin = mannequin;
+  sceneManager.fitCameraToObject(mannequin);
+
 
   stateManager.setGender(gender);
 
@@ -294,3 +296,4 @@ window.exportImage = function () {
 window.switchGender = switchGender;
 window.setMode = setMode;
 window.changeColor = changeColor;
+
