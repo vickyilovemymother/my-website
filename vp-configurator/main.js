@@ -270,6 +270,7 @@ window.exportImage = function () {
 window.switchGender = switchGender;
 window.setMode = setMode;
 window.changeColor = changeColor;
+window.exportImage = exportImage;
 
 /* ================= MODE ================= */
 
@@ -300,3 +301,4 @@ async function switchGender(gender) {
 
   populateSliders(gender);
 }
+
