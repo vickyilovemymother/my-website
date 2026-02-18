@@ -5,83 +5,143 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>VP Configurator Engine</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#050505;
-  --accent:#00f2ea;
-  --panel:rgba(15,15,15,0.9);
+    --bg:#050505;
+    --accent:#00f2ea;
+    --panel:rgba(15,15,15,0.95);
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
-  background:var(--bg);
-  font-family:'Inter',sans-serif;
-  color:#fff;
-  overflow:hidden;
+    background:var(--bg);
+    font-family:'Inter',sans-serif;
+    color:#fff;
+    overflow:hidden;
 }
 
+/* ===== TOP BAR ===== */
 .top-bar{
-  position:absolute;
-  top:0;left:0;width:100%;height:70px;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:0 40px;
-  background:rgba(0,0,0,0.7);
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  z-index:20;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:70px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 40px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(15px);
+    z-index:20;
 }
 
+.top-title{
+    font-family:'Space Grotesk';
+    font-size:18px;
+}
+
+/* ===== PANELS ===== */
 .panel{
-  position:absolute;
-  top:70px;width:260px;height:calc(100% - 70px);
-  background:var(--panel);
-  padding:20px;overflow:auto;
+    position:absolute;
+    top:70px;
+    width:260px;
+    height:calc(100% - 70px);
+    background:var(--panel);
+    padding:20px;
+    overflow-y:auto;
+    z-index:15;
 }
 
-.left-panel{left:0;border-right:1px solid rgba(255,255,255,0.1);}
-.right-panel{right:0;border-left:1px solid rgba(255,255,255,0.1);}
+.left-panel{
+    left:0;
+    border-right:1px solid rgba(255,255,255,0.1);
+}
 
-.panel h4{margin:20px 0 10px;font-family:'Space Grotesk';}
+.right-panel{
+    right:0;
+    border-left:1px solid rgba(255,255,255,0.1);
+}
+
+.panel h4{
+    margin:20px 0 10px;
+    font-family:'Space Grotesk';
+    font-size:14px;
+    letter-spacing:1px;
+}
 
 .panel button,
-.panel select,
-.panel input{
-  width:100%;
-  margin-bottom:10px;
-  padding:8px;
-  border-radius:6px;
-  border:1px solid rgba(255,255,255,0.2);
-  background:transparent;
-  color:#aaa;
-  font-size:12px;
+.panel input,
+.panel select{
+    width:100%;
+    margin-bottom:8px;
+    padding:8px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.2);
+    color:#aaa;
+    border-radius:6px;
+    font-size:12px;
+    cursor:pointer;
 }
 
 .panel button:hover{
-  border-color:var(--accent);
-  color:var(--accent);
+    border-color:var(--accent);
+    color:var(--accent);
 }
 
+/* ===== CANVAS ===== */
 #vp-canvas{
-  position:absolute;
-  top:70px;left:260px;right:260px;bottom:0;
+    position:absolute;
+    top:70px;
+    left:260px;
+    right:260px;
+    bottom:0;
 }
 
-#exportPreview{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:200;
+/* ===== GARMENT SLIDER ===== */
+.garment-slider{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding:8px 0;
 }
-#exportPreview canvas{
-  border:2px solid var(--accent);
+
+.garment-slider::-webkit-scrollbar{
+    display:none;
+}
+
+.garment-card{
+    min-width:70px;
+    height:80px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.garment-card img{
+    width:60px;
+    height:60px;
+    object-fit:contain;
+}
+
+.garment-card:hover{
+    border-color:var(--accent);
 }
 </style>
 
+<!-- IMPORT MAP -->
 <script type="importmap">
 {
   "imports": {
@@ -90,60 +150,67 @@ body{
   }
 }
 </script>
+
 </head>
 
 <body>
 
 <div class="top-bar">
-  <div>VP Configurator Engine</div>
-  <div style="color:var(--accent)">READY</div>
+    <div class="top-title">VP Configurator Engine</div>
+    <div style="color:var(--accent); font-size:12px;">READY</div>
 </div>
 
+<!-- LEFT PANEL -->
 <div class="panel left-panel">
-  <h4>Mode</h4>
-  <button onclick="setMode('mix')">Mix & Match</button>
 
-  <h4>Performance</h4>
-  <button onclick="togglePerformance()">Performance Mode</button>
+    <h4>Gender</h4>
+    <button onclick="switchGender('men')">Men</button>
+    <button onclick="switchGender('women')">Women</button>
 
-  <h4>Spin</h4>
-  <button onclick="toggleSpin()">Auto Spin</button>
+    <h4>Mode</h4>
+    <button onclick="setMode('mix')">Mix & Match</button>
+    <button onclick="setMode('dress')">Dress Mode</button>
 
-  <h4>Preset</h4>
-  <button onclick="savePreset()">Save Outfit</button>
-  <button onclick="loadPreset()">Load Outfit</button>
+    <!-- MIX SECTION -->
+    <div id="mix-section">
+
+        <h4>Top</h4>
+        <div id="top-slider" class="garment-slider"></div>
+
+        <h4>Bottom</h4>
+        <div id="bottom-slider" class="garment-slider"></div>
+
+        <h4>Jacket</h4>
+        <div id="jacket-slider" class="garment-slider"></div>
+
+    </div>
+
+    <!-- DRESS SECTION -->
+    <div id="dress-section" style="display:none;">
+
+        <h4>Dress</h4>
+        <div id="dress-slider" class="garment-slider"></div>
+
+    </div>
+
 </div>
 
+<!-- RIGHT PANEL -->
 <div class="panel right-panel">
 
-  <h4>Garment Color</h4>
-  <input type="color" onchange="changeColor('top', this.value)">
-  <input type="color" onchange="changeColor('bottom', this.value)">
+    <h4>Top Color</h4>
+    <input type="color" onchange="changeColor('top', this.value)">
 
-  <h4>Background</h4>
-  <input type="color" id="bgColorPicker" value="#000000">
-
-  <h4>HDR Intensity (1-10)</h4>
-  <input type="range" id="hdrIntensity" min="1" max="10" step="1" value="5">
-
-  <h4>HDR Visibility</h4>
-  <button onclick="toggleHDR()">Toggle HDR</button>
-
-  <h4>Shadow</h4>
-  <button onclick="toggleShadow()">Toggle Shadow</button>
-
-  <h4>Export</h4>
-  <input type="number" id="exportWidth" placeholder="Width (e.g 2048)">
-  <input type="number" id="exportHeight" placeholder="Height (e.g 2048)">
-  <button onclick="exportPNG(false)">Export PNG</button>
-  <button onclick="exportPNG(true)">Transparent PNG</button>
-  <button onclick="exportGIF()">Export Turntable GIF</button>
+    <h4>Bottom Color</h4>
+    <input type="color" onchange="changeColor('bottom', this.value)">
 
 </div>
 
+<!-- 3D VIEW -->
 <div id="vp-canvas"></div>
-<div id="exportPreview"></div>
 
+<!-- MAIN SCRIPT -->
 <script type="module" src="./vp-configurator/main.js"></script>
+
 </body>
 </html>
