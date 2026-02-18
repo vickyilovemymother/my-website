@@ -1,271 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VP Configurator Engine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VP Configurator Engine</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      --bg:#050505;
-      --accent:#00f2ea;
-      --panel:rgba(15,15,15,0.9);
-    }
+<style>
+:root{
+    --bg:#050505;
+    --accent:#00f2ea;
+    --panel:rgba(15,15,15,0.9);
+}
 
-    *{ margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-    body{
-      background:var(--bg);
-      font-family:'Inter',sans-serif;
-      color:#fff;
-      overflow:hidden;
-    }
+body{
+    background:var(--bg);
+    font-family:'Inter',sans-serif;
+    color:#fff;
+    overflow:hidden;
+}
 
-    /* ===== TOP BAR ===== */
-    .top-bar{
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:70px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:0 40px;
-      border-bottom:1px solid rgba(255,255,255,0.1);
-      background:rgba(0,0,0,0.6);
-      backdrop-filter:blur(15px);
-      z-index:20;
-    }
+/* ===== TOP BAR ===== */
+.top-bar{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:70px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 40px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(15px);
+    z-index:20;
+}
 
-    .top-title{
-      font-family:'Space Grotesk';
-      font-size:18px;
-      letter-spacing:1px;
-    }
+.top-title{
+    font-family:'Space Grotesk';
+    font-size:18px;
+    letter-spacing:1px;
+}
 
-    .back-btn{
-      color:#aaa;
-      text-decoration:none;
-      border:1px solid rgba(255,255,255,0.2);
-      padding:8px 18px;
-      border-radius:6px;
-      transition:0.3s;
-    }
+.back-btn{
+    color:#aaa;
+    text-decoration:none;
+    border:1px solid rgba(255,255,255,0.2);
+    padding:8px 18px;
+    border-radius:6px;
+    transition:0.3s;
+}
 
-    .back-btn:hover{
-      border-color:var(--accent);
-      color:var(--accent);
-    }
+.back-btn:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+}
 
-    /* ===== PANELS ===== */
-    .panel{
-      position:absolute;
-      top:70px;
-      width:260px;
-      height:calc(100% - 70px);
-      background:var(--panel);
-      backdrop-filter:blur(20px);
-      padding:25px;
-      z-index:15;
-      overflow-y:auto;
-    }
+/* ===== PANELS ===== */
+.panel{
+    position:absolute;
+    top:70px;
+    width:260px;
+    height:calc(100% - 70px);
+    background:var(--panel);
+    backdrop-filter:blur(20px);
+    padding:25px;
+    z-index:15;
+    overflow-y:auto;
+}
 
-    .left-panel{
-      left:0;
-      border-right:1px solid rgba(255,255,255,0.1);
-    }
+.left-panel{
+    left:0;
+    border-right:1px solid rgba(255,255,255,0.1);
+}
 
-    .right-panel{
-      right:0;
-      border-left:1px solid rgba(255,255,255,0.1);
-    }
+.right-panel{
+    right:0;
+    border-left:1px solid rgba(255,255,255,0.1);
+}
 
-    .panel h4{
-      margin:20px 0 10px;
-      font-family:'Space Grotesk';
-    }
+.panel h4{
+    margin:20px 0 10px;
+    font-family:'Space Grotesk';
+}
 
-    .panel button,
-    .panel select,
-    .panel input{
-      width:100%;
-      margin-bottom:10px;
-      padding:8px;
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.2);
-      color:#aaa;
-      border-radius:6px;
-      font-size:12px;
-    }
+.panel button{
+    width:100%;
+    margin-bottom:8px;
+    padding:8px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.2);
+    color:#aaa;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:12px;
+}
 
-    .panel button{
-      cursor:pointer;
-      transition:0.3s;
-    }
+.panel button:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+    background:rgba(0,242,234,0.05);
+}
 
-    .panel button:hover{
-      border-color:var(--accent);
-      color:var(--accent);
-      background:rgba(0,242,234,0.05);
-    }
+/* ===== CANVAS ===== */
+#vp-canvas{
+    position:absolute;
+    top:70px;
+    left:260px;
+    right:260px;
+    bottom:0;
+}
 
-    /* ===== CANVAS ===== */
-    #vp-canvas{
-      position:absolute;
-      top:70px;
-      left:260px;
-      right:260px;
-      bottom:0;
-    }
+/* ===== LOADING ===== */
+#loading-screen{
+    position:absolute;
+    inset:0;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Grotesk';
+    letter-spacing:2px;
+    font-size:14px;
+    z-index:100;
+}
+</style>
 
-    /* ===== LOADING ===== */
-    #loading-screen{
-      position:absolute;
-      inset:0;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:'Space Grotesk';
-      letter-spacing:2px;
-      font-size:14px;
-      z-index:100;
-    }
+<!-- IMPORT MAP -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 
-    /* ===== GARMENT SLIDER ===== */
-    .garment-slider{
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      padding:10px 5px;
-      scroll-behavior:smooth;
-    }
-
-    .garment-slider::-webkit-scrollbar{
-      display:none;
-    }
-
-    .garment-card{
-      min-width:80px;
-      height:90px;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      transition:all 0.3s ease;
-    }
-
-    .garment-card img{
-      width:70px;
-      height:70px;
-      object-fit:contain;
-      pointer-events:none;
-    }
-
-    .garment-card:hover{
-      border-color:var(--accent);
-      background:rgba(0,242,234,0.05);
-    }
-
-    .garment-card.active{
-      border-color:var(--accent);
-      box-shadow:0 0 12px rgba(0,242,234,0.4);
-    }
-
-    .slider-section{
-      margin-bottom:25px;
-    }
-  </style>
-
-  <!-- IMPORT MAP -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
 </head>
-
 <body>
 
-  <div id="loading-screen">Initializing VP Configurator Engine...</div>
+<div id="loading-screen">Initializing VP Configurator Engine...</div>
 
-  <div class="top-bar">
+<div class="top-bar">
     <a href="portfolio.html" class="back-btn">← Back</a>
     <div class="top-title">VP Configurator Engine</div>
     <div style="color:var(--accent); font-size:12px;">READY</div>
-  </div>
+</div>
 
-  <!-- LEFT PANEL -->
-  <div class="panel left-panel">
+<!-- LEFT PANEL -->
+<div class="panel left-panel">
+
     <h4>Gender</h4>
     <button onclick="switchGender('men')">Men</button>
     <button onclick="switchGender('women')">Women</button>
 
-    <h4>Mode</h4>
-    <button onclick="setMode('mix')">Mix & Match</button>
-    <button onclick="setMode('dress')">Dress Mode</button>
+    <h4>Camera</h4>
+    <button onclick="toggleSpin()">Auto Spin</button>
 
-    <div id="mix-section" style="display:none;">
-      <h4>Top</h4>
-      <div class="slider-section">
-        <div id="top-slider" class="garment-slider"></div>
-      </div>
+</div>
 
-      <h4>Bottom</h4>
-      <div class="slider-section">
-        <div id="bottom-slider" class="garment-slider"></div>
-      </div>
+<!-- RIGHT PANEL -->
+<div class="panel right-panel">
 
-      <h4>Jacket</h4>
-      <div class="slider-section">
-        <div id="jacket-slider" class="garment-slider"></div>
-      </div>
-    </div>
-
-    <div id="dress-section" style="display:none;">
-      <h4>Dress</h4>
-      <div class="slider-section">
-        <div id="dress-slider" class="garment-slider"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="panel right-panel">
-
-    <h4>Garment Color</h4>
+    <h4>Color</h4>
     <input type="color" onchange="changeColor('top', this.value)">
     <input type="color" onchange="changeColor('bottom', this.value)">
 
     <h4>Background</h4>
     <input type="color" id="bgColorPicker" value="#000000">
 
-    <h4>HDR Intensity</h4>
-    <input type="range" id="hdrIntensity" min="0" max="5" step="0.1" value="1">
+    <h4>HDR Intensity (1–10)</h4>
+    <input type="range" id="hdrIntensity" min="1" max="10" step="0.5" value="1">
 
-    <h4>Export Render</h4>
-    <select id="resolutionSelect">
-      <option value="1024">1024 x 1024</option>
-      <option value="2048">2048 x 2048</option>
-      <option value="4096">4096 x 4096</option>
-    </select>
-
+    <h4>Export</h4>
     <button onclick="exportImage()">Export PNG</button>
 
-  </div>
+    <h4>Performance</h4>
+    <button onclick="togglePerformance()">Low GPU Mode</button>
 
-  <div id="vp-canvas"></div>
+</div>
 
-  <script type="module" src="./vp-configurator/main.js"></script>
+<div id="vp-canvas"></div>
+
+<script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
 </html>
