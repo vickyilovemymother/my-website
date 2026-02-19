@@ -1,146 +1,192 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { SceneManager } from "./core/SceneManager.js";
+import { EnvironmentManager } from "./core/EnvironmentManager.js";
+import { ModelLoader } from "./core/ModelLoader.js";
+import { StateManager } from "./core/StateManager.js";
 
-export class SceneManager {
-  constructor() {
-    this.container = document.getElementById("vp-canvas");
-    if (!this.container) {
-      throw new Error("vp-canvas container not found.");
-    }
+/* ================= SETUP ================= */
 
-    /* ================= SCENE ================= */
-    this.scene = new THREE.Scene();
+const loadingScreen = document.getElementById("loading-screen");
 
-    /* ================= CAMERA ================= */
-    this.camera = new THREE.PerspectiveCamera(
-      45,
-      this.container.clientWidth / this.container.clientHeight,
-      0.1,
-      1000
-    );
+const sceneManager = new SceneManager();
+const environmentManager = new EnvironmentManager(sceneManager);
+const modelLoader = new ModelLoader();
+const stateManager = new StateManager();
 
-    this.camera.position.set(0, 1.4, 4);
+let currentMannequin = null;
 
-    /* ================= RENDERER ================= */
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      preserveDrawingBuffer: true
-    });
+let garments = {
+  top: null,
+  bottom: null,
+  jacket: null,
+  dress: null
+};
 
-    this.renderer.setSize(
-      this.container.clientWidth,
-      this.container.clientHeight
-    );
+/* ================= INIT ================= */
 
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+async function init() {
+  await environmentManager.loadHDR(
+    "/vp-configurator/assets/hdr/hc_vp.hdr"
+  );
 
-    this.renderer.shadowMap.enabled = true;
+  await loadMannequin("men");
 
-    this.container.appendChild(this.renderer.domElement);
+  sceneManager.start();
 
-    /* ================= CONTROLS ================= */
-    this.controls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
+  if (loadingScreen) loadingScreen.style.display = "none";
+}
 
-    this.controls.enableDamping = true;
-    this.controls.target.set(0, 1.2, 0);
+init();
 
-    /* ================= LIGHT ================= */
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
-    this.scene.add(this.ambientLight);
+/* ================= MANNEQUIN ================= */
 
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    this.directionalLight.position.set(5, 10, 5);
-    this.directionalLight.castShadow = true;
-    this.scene.add(this.directionalLight);
+async function loadMannequin(gender) {
+  const path =
+    gender === "women"
+      ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
+      : "/vp-configurator/assets/mannequin/men_mannequin.glb";
 
-    /* ================= GROUND SHADOW ================= */
-    const planeGeo = new THREE.PlaneGeometry(10, 10);
-    const planeMat = new THREE.ShadowMaterial({ opacity: 0.25 });
-    this.ground = new THREE.Mesh(planeGeo, planeMat);
-    this.ground.rotation.x = -Math.PI / 2;
-    this.ground.position.y = 0;
-    this.ground.receiveShadow = true;
-    this.scene.add(this.ground);
-
-    /* ================= AUTO SPIN ================= */
-    this.autoSpin = false;
-
-    window.addEventListener("resize", () => this.onResize());
+  if (currentMannequin) {
+    sceneManager.scene.remove(currentMannequin);
   }
 
-  add(object) {
+  const mannequin = await modelLoader.loadModel(path);
+  mannequin.position.set(0, 0, 0);
+
+  sceneManager.add(mannequin);
+  currentMannequin = mannequin;
+
+  sceneManager.fitCameraToObject(mannequin);
+
+  stateManager.setGender(gender);
+}
+
+/* ================= GARMENT LOAD ================= */
+
+async function loadGarment(type, fileName) {
+  const gender = stateManager.getState().gender;
+  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
+
+  const model = await modelLoader.loadModel(path);
+
+  if (garments[type]) {
+    sceneManager.scene.remove(garments[type]);
+  }
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.material.transparent = true;
+      child.material.opacity = 0;
+    }
+  });
+
+  garments[type] = model;
+  sceneManager.add(model);
+
+  fadeIn(model);
+}
+
+/* ================= FADE IN ================= */
+
+function fadeIn(object) {
+  let opacity = 0;
+
+  function animate() {
+    opacity += 0.05;
+
     object.traverse((child) => {
       if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+        child.material.opacity = opacity;
       }
     });
 
-    this.scene.add(object);
+    if (opacity < 1) requestAnimationFrame(animate);
   }
 
-  fitCameraToObject(object) {
-    const box = new THREE.Box3().setFromObject(object);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = this.camera.fov * (Math.PI / 180);
-
-    let distance = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-    distance *= 1.6;
-
-    this.smoothMove(center.x, center.y, distance);
-  }
-
-  smoothMove(x, y, z) {
-    const start = this.camera.position.clone();
-    const end = new THREE.Vector3(x, y, z);
-
-    let progress = 0;
-
-    const animate = () => {
-      progress += 0.05;
-      this.camera.position.lerpVectors(start, end, progress);
-      this.camera.lookAt(0, 1.2, 0);
-
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-
-    animate();
-  }
-
-  toggleSpin() {
-    this.autoSpin = !this.autoSpin;
-  }
-
-  start() {
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      if (this.autoSpin) {
-        this.scene.rotation.y += 0.005;
-      }
-
-      this.controls.update();
-      this.renderer.render(this.scene, this.camera);
-    };
-
-    animate();
-  }
-
-  onResize() {
-    const width = this.container.clientWidth;
-    const height = this.container.clientHeight;
-
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
-  }
+  animate();
 }
+
+/* ================= COLOR ================= */
+
+function changeColor(type, value) {
+  if (!garments[type]) return;
+
+  garments[type].traverse((child) => {
+    if (child.isMesh && child.material.color) {
+      child.material.color.set(value);
+    }
+  });
+}
+
+window.changeColor = changeColor;
+
+/* ================= BACKGROUND ================= */
+
+document.getElementById("bgColorPicker")?.addEventListener("input", (e) => {
+  sceneManager.renderer.setClearColor(e.target.value);
+});
+
+/* ================= HDR INTENSITY ================= */
+
+document.getElementById("hdrIntensity")?.addEventListener("input", (e) => {
+  const intensity = parseFloat(e.target.value);
+
+  sceneManager.scene.traverse((child) => {
+    if (child.isMesh && child.material.envMapIntensity !== undefined) {
+      child.material.envMapIntensity = intensity;
+    }
+  });
+});
+
+/* ================= CAMERA SHORTCUTS ================= */
+
+window.addEventListener("keydown", (e) => {
+  const dist = sceneManager.camera.position.length();
+
+  switch (e.key) {
+    case "2": sceneManager.smoothMove(0, 1.2, dist); break;
+    case "8": sceneManager.smoothMove(0, 1.2, -dist); break;
+    case "4": sceneManager.smoothMove(-dist, 1.2, 0); break;
+    case "6": sceneManager.smoothMove(dist, 1.2, 0); break;
+    case "5": sceneManager.smoothMove(0, dist, 0); break;
+    case "0": sceneManager.smoothMove(0, -dist, 0); break;
+  }
+});
+
+/* ================= EXPORT ================= */
+
+window.exportImage = function () {
+  const width = parseInt(prompt("Width?", "2048"));
+  const height = parseInt(prompt("Height?", "2048"));
+  const transparent = confirm("Transparent PNG?");
+
+  const renderer = sceneManager.renderer;
+  const camera = sceneManager.camera;
+  const scene = sceneManager.scene;
+
+  const originalSize = renderer.getSize(new THREE.Vector2());
+  const originalBg = renderer.getClearColor().clone();
+
+  if (transparent) {
+    renderer.setClearColor(0x000000, 0);
+  }
+
+  renderer.setSize(width, height);
+  renderer.render(scene, camera);
+
+  const dataURL = renderer.domElement.toDataURL("image/png");
+
+  const link = document.createElement("a");
+  link.href = dataURL;
+  link.download = "vp_render.png";
+  link.click();
+
+  renderer.setSize(originalSize.x, originalSize.y);
+  renderer.setClearColor(originalBg);
+};
+
+/* ================= AUTO SPIN ================= */
+
+window.toggleSpin = function () {
+  sceneManager.toggleSpin();
+};
