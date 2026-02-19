@@ -1,197 +1,146 @@
 import * as THREE from "three";
-import { SceneManager } from "./core/SceneManager.js";
-import { EnvironmentManager } from "./core/EnvironmentManager.js";
-import { ModelLoader } from "./core/ModelLoader.js";
-import { StateManager } from "./core/StateManager.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const sceneManager = new SceneManager();
-const environmentManager = new EnvironmentManager(sceneManager);
-const modelLoader = new ModelLoader();
-const stateManager = new StateManager();
-
-let currentMannequin = null;
-
-let garments = {
-  top: null,
-  bottom: null,
-  jacket: null,
-  dress: null
-};
-
-/* ================= INIT ================= */
-
-async function init() {
-  await environmentManager.loadHDR(
-    "/vp-configurator/assets/hdr/hc_vp.hdr"
-  );
-
-  await loadMannequin("men");
-
-  populateSliders("men");
-  setMode("mix");
-
-  sceneManager.start();
-}
-
-init();
-
-/* ================= MANNEQUIN ================= */
-
-async function loadMannequin(gender) {
-  const path =
-    gender === "women"
-      ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
-      : "/vp-configurator/assets/mannequin/men_mannequin.glb";
-
-  if (currentMannequin) sceneManager.remove(currentMannequin);
-
-  const mannequin = await modelLoader.loadModel(path);
-
-  mannequin.position.set(0, 0, 0);
-
-  sceneManager.add(mannequin);
-  currentMannequin = mannequin;
-
-  sceneManager.fitCameraToObject(mannequin);
-
-  stateManager.setGender(gender);
-}
-
-/* ================= GARMENTS ================= */
-
-const garmentConfig = {
-  men: {
-    top: ["top01", "top02"],
-    bottom: ["btm01"],
-    jacket: [],
-    dress: []
-  },
-  women: {
-    top: ["top01"],
-    bottom: ["btm01"],
-    jacket: [],
-    dress: []
-  }
-};
-
-function populateSliders(gender) {
-  const config = garmentConfig[gender];
-
-  Object.keys(config).forEach((category) => {
-    const slider = document.getElementById(category + "-slider");
-    if (!slider) return;
-
-    slider.innerHTML = "";
-
-    config[category].forEach((name) => {
-      const card = document.createElement("div");
-      card.className = "garment-card";
-
-      const img = document.createElement("img");
-      img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
-
-      card.appendChild(img);
-
-      card.onclick = async () => {
-        await loadGarment(category, name + ".glb");
-      };
-
-      slider.appendChild(card);
-    });
-  });
-}
-
-async function loadGarment(type, fileName) {
-  const gender = stateManager.getState().gender;
-  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
-
-  const model = await modelLoader.loadModel(path);
-
-  if (garments[type]) sceneManager.remove(garments[type]);
-
-  model.traverse((child) => {
-    if (child.isMesh) {
-      child.material.transparent = true;
-      child.material.opacity = 0;
+export class SceneManager {
+  constructor() {
+    this.container = document.getElementById("vp-canvas");
+    if (!this.container) {
+      throw new Error("vp-canvas container not found.");
     }
-  });
 
-  garments[type] = model;
-  sceneManager.add(model);
+    /* ================= SCENE ================= */
+    this.scene = new THREE.Scene();
 
-  fadeIn(model);
-}
+    /* ================= CAMERA ================= */
+    this.camera = new THREE.PerspectiveCamera(
+      45,
+      this.container.clientWidth / this.container.clientHeight,
+      0.1,
+      1000
+    );
 
-/* ================= FADE ================= */
+    this.camera.position.set(0, 1.4, 4);
 
-function fadeIn(object) {
-  let opacity = 0;
+    /* ================= RENDERER ================= */
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true
+    });
 
-  function animate() {
-    opacity += 0.05;
+    this.renderer.setSize(
+      this.container.clientWidth,
+      this.container.clientHeight
+    );
 
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    this.renderer.shadowMap.enabled = true;
+
+    this.container.appendChild(this.renderer.domElement);
+
+    /* ================= CONTROLS ================= */
+    this.controls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
+
+    this.controls.enableDamping = true;
+    this.controls.target.set(0, 1.2, 0);
+
+    /* ================= LIGHT ================= */
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    this.scene.add(this.ambientLight);
+
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    this.directionalLight.position.set(5, 10, 5);
+    this.directionalLight.castShadow = true;
+    this.scene.add(this.directionalLight);
+
+    /* ================= GROUND SHADOW ================= */
+    const planeGeo = new THREE.PlaneGeometry(10, 10);
+    const planeMat = new THREE.ShadowMaterial({ opacity: 0.25 });
+    this.ground = new THREE.Mesh(planeGeo, planeMat);
+    this.ground.rotation.x = -Math.PI / 2;
+    this.ground.position.y = 0;
+    this.ground.receiveShadow = true;
+    this.scene.add(this.ground);
+
+    /* ================= AUTO SPIN ================= */
+    this.autoSpin = false;
+
+    window.addEventListener("resize", () => this.onResize());
+  }
+
+  add(object) {
     object.traverse((child) => {
-      if (child.isMesh) child.material.opacity = opacity;
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
     });
 
-    if (opacity < 1) requestAnimationFrame(animate);
+    this.scene.add(object);
   }
 
-  animate();
-}
+  fitCameraToObject(object) {
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
 
-/* ================= COLOR ================= */
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = this.camera.fov * (Math.PI / 180);
 
-function changeColor(type, value) {
-  if (!garments[type]) return;
+    let distance = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+    distance *= 1.6;
 
-  garments[type].traverse((child) => {
-    if (child.isMesh) child.material.color.set(value);
-  });
-}
-
-window.changeColor = changeColor;
-
-/* ================= MODE ================= */
-
-function setMode(mode) {
-  const mix = document.getElementById("mix-section");
-  const dress = document.getElementById("dress-section");
-
-  mix.style.display = mode === "mix" ? "block" : "none";
-  dress.style.display = mode === "dress" ? "block" : "none";
-}
-
-window.setMode = setMode;
-
-/* ================= GENDER ================= */
-
-async function switchGender(gender) {
-  await loadMannequin(gender);
-
-  Object.keys(garments).forEach((key) => {
-    if (garments[key]) {
-      sceneManager.remove(garments[key]);
-      garments[key] = null;
-    }
-  });
-
-  populateSliders(gender);
-}
-
-window.switchGender = switchGender;
-
-/* ================= CAMERA SHORTCUTS ================= */
-
-window.addEventListener("keydown", (e) => {
-  if (!currentMannequin) return;
-
-  const dist = sceneManager.camera.position.length();
-
-  switch (e.key) {
-    case "2": sceneManager.smoothMoveCamera(0, 1.2, dist); break;
-    case "8": sceneManager.smoothMoveCamera(0, 1.2, -dist); break;
-    case "4": sceneManager.smoothMoveCamera(-dist, 1.2, 0); break;
-    case "6": sceneManager.smoothMoveCamera(dist, 1.2, 0); break;
+    this.smoothMove(center.x, center.y, distance);
   }
-});
+
+  smoothMove(x, y, z) {
+    const start = this.camera.position.clone();
+    const end = new THREE.Vector3(x, y, z);
+
+    let progress = 0;
+
+    const animate = () => {
+      progress += 0.05;
+      this.camera.position.lerpVectors(start, end, progress);
+      this.camera.lookAt(0, 1.2, 0);
+
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    animate();
+  }
+
+  toggleSpin() {
+    this.autoSpin = !this.autoSpin;
+  }
+
+  start() {
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      if (this.autoSpin) {
+        this.scene.rotation.y += 0.005;
+      }
+
+      this.controls.update();
+      this.renderer.render(this.scene, this.camera);
+    };
+
+    animate();
+  }
+
+  onResize() {
+    const width = this.container.clientWidth;
+    const height = this.container.clientHeight;
+
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+}
