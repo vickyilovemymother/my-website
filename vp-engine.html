@@ -38,8 +38,8 @@ body{
   justify-content:space-between;
   align-items:center;
   padding:0 40px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  background:rgba(0,0,0,0.6);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  background:rgba(0,0,0,0.7);
   backdrop-filter:blur(15px);
   z-index:20;
 }
@@ -68,30 +68,33 @@ body{
 .panel{
   position:absolute;
   top:70px;
-  width:280px;
+  width:260px;
   height:calc(100% - 70px);
   background:var(--panel);
   backdrop-filter:blur(20px);
   padding:25px;
-  z-index:15;
   overflow-y:auto;
+  z-index:15;
 }
 
 .left-panel{
   left:0;
-  border-right:1px solid rgba(255,255,255,0.1);
+  border-right:1px solid rgba(255,255,255,0.08);
 }
 
 .right-panel{
   right:0;
-  border-left:1px solid rgba(255,255,255,0.1);
+  border-left:1px solid rgba(255,255,255,0.08);
 }
 
 .panel h4{
   margin:20px 0 10px;
   font-family:'Space Grotesk';
-  font-size:14px;
+  font-weight:600;
+  font-size:13px;
   letter-spacing:1px;
+  text-transform:uppercase;
+  opacity:0.8;
 }
 
 .panel button{
@@ -110,15 +113,57 @@ body{
 .panel button:hover{
   border-color:var(--accent);
   color:var(--accent);
-  background:rgba(0,242,234,0.05);
+}
+
+/* ===== COLOR INPUT ===== */
+input[type="color"]{
+  width:100%;
+  height:35px;
+  border:none;
+  margin-bottom:10px;
+  background:none;
+  cursor:pointer;
+}
+
+/* ===== RANGE SLIDER ===== */
+input[type="range"]{
+  width:100%;
+  margin-bottom:15px;
+}
+
+/* ===== SELECT ===== */
+select{
+  width:100%;
+  padding:6px;
+  margin-bottom:10px;
+  background:#111;
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+/* ===== EXPORT BUTTON ===== */
+.export-btn{
+  width:100%;
+  padding:8px;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.2);
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.export-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
 }
 
 /* ===== CANVAS ===== */
 #vp-canvas{
   position:absolute;
   top:70px;
-  left:280px;
-  right:280px;
+  left:260px;
+  right:260px;
   bottom:0;
 }
 
@@ -135,73 +180,6 @@ body{
   font-size:14px;
   z-index:100;
 }
-
-/* ===== GARMENT SLIDER ===== */
-.garment-slider{
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:10px 5px;
-  scroll-behavior:smooth;
-}
-
-.garment-slider::-webkit-scrollbar{
-  display:none;
-}
-
-.garment-card{
-  min-width:80px;
-  height:90px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:all 0.3s ease;
-}
-
-.garment-card img{
-  width:70px;
-  height:70px;
-  object-fit:contain;
-  pointer-events:none;
-}
-
-.garment-card:hover{
-  border-color:var(--accent);
-  background:rgba(0,242,234,0.05);
-}
-
-.garment-card.active{
-  border-color:var(--accent);
-  box-shadow:0 0 12px rgba(0,242,234,0.4);
-}
-
-.slider-section{
-  margin-bottom:25px;
-}
-
-/* ===== FORM CONTROLS ===== */
-input[type="color"],
-input[type="range"],
-select{
-  width:100%;
-  margin-bottom:12px;
-}
-
-select{
-  background:#111;
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.2);
-  padding:6px;
-  border-radius:4px;
-}
-
-.export-btn{
-  margin-top:5px;
-}
 </style>
 
 <!-- IMPORT MAP -->
@@ -209,18 +187,19 @@ select{
 {
   "imports": {
     "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/examples/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
   }
 }
 </script>
 
 </head>
+
 <body>
 
 <div id="loading-screen">Initializing VP Configurator Engine...</div>
 
 <div class="top-bar">
-  <a href="portfolio.html" class="back-btn">← Back</a>
+  <a href="/index.html" class="back-btn">← Back</a>
   <div class="top-title">VP Configurator Engine</div>
   <div style="color:var(--accent); font-size:12px;">READY</div>
 </div>
@@ -233,36 +212,8 @@ select{
   <button onclick="switchGender('women')">Women</button>
 
   <h4>Mode</h4>
-  <button onclick="setMode('mix')">Mix & Match</button>
-  <button onclick="setMode('dress')">Dress Mode</button>
-
-  <!-- MIX -->
-  <div id="mix-section" style="display:none;">
-
-    <h4>Top</h4>
-    <div class="slider-section">
-      <div id="top-slider" class="garment-slider"></div>
-    </div>
-
-    <h4>Bottom</h4>
-    <div class="slider-section">
-      <div id="bottom-slider" class="garment-slider"></div>
-    </div>
-
-    <h4>Jacket</h4>
-    <div class="slider-section">
-      <div id="jacket-slider" class="garment-slider"></div>
-    </div>
-
-  </div>
-
-  <!-- DRESS -->
-  <div id="dress-section" style="display:none;">
-    <h4>Dress</h4>
-    <div class="slider-section">
-      <div id="dress-slider" class="garment-slider"></div>
-    </div>
-  </div>
+  <button onclick="setMode && setMode('mix')">Mix & Match</button>
+  <button onclick="setMode && setMode('dress')">Dress Mode</button>
 
 </div>
 
@@ -276,12 +227,12 @@ select{
   <input type="color" onchange="changeColor('bottom', this.value)">
 
   <h4>Background</h4>
-  <input type="color" id="bgColorPicker" value="#000000">
+  <input type="color" id="bgColorPicker" value="#050505">
 
   <h4>HDR Intensity</h4>
-  <input type="range" id="hdrIntensity" min="0" max="10" step="0.1" value="1">
+  <input type="range" id="hdrIntensity" min="1" max="10" step="0.1" value="1">
 
-  <h4>Export Resolution</h4>
+  <h4>Export</h4>
   <select id="resolutionSelect">
     <option value="1024">1024 x 1024</option>
     <option value="2048">2048 x 2048</option>
@@ -292,10 +243,8 @@ select{
 
 </div>
 
-<!-- 3D CANVAS -->
 <div id="vp-canvas"></div>
 
-<!-- MAIN ENGINE -->
 <script type="module" src="./vp-configurator/main.js"></script>
 
 </body>
