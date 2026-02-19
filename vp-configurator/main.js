@@ -4,6 +4,8 @@ import { EnvironmentManager } from "./core/EnvironmentManager.js";
 import { ModelLoader } from "./core/ModelLoader.js";
 import { StateManager } from "./core/StateManager.js";
 
+const loadingScreen = document.getElementById("loading-screen");
+
 const sceneManager = new SceneManager();
 const environmentManager = new EnvironmentManager(sceneManager);
 const modelLoader = new ModelLoader();
@@ -18,23 +20,9 @@ let garments = {
   dress: null
 };
 
-const garmentConfig = {
-  men: {
-    top: ["top01", "top02"],
-    bottom: ["btm01"],
-    jacket: [],
-    dress: []
-  },
-  women: {
-    top: ["top01"],
-    bottom: ["btm01"],
-    jacket: [],
-    dress: []
-  }
-};
+/* ================= INIT ================= */
 
 async function init() {
-
   await environmentManager.loadHDR(
     "/vp-configurator/assets/hdr/hc_vp.hdr"
   );
@@ -43,23 +31,21 @@ async function init() {
 
   sceneManager.start();
 
-  populateSliders("men");
-  setMode("mix");
-
-  document.getElementById("loading-screen").style.display = "none";
+  if (loadingScreen) loadingScreen.style.display = "none";
 }
 
 init();
 
-async function loadMannequin(gender) {
+/* ================= MANNEQUIN ================= */
 
+async function loadMannequin(gender) {
   const path =
     gender === "women"
       ? "/vp-configurator/assets/mannequin/women_mannequin.glb"
       : "/vp-configurator/assets/mannequin/men_mannequin.glb";
 
   if (currentMannequin) {
-    sceneManager.remove(currentMannequin);
+    sceneManager.scene.remove(currentMannequin);
   }
 
   const mannequin = await modelLoader.loadModel(path);
@@ -70,169 +56,41 @@ async function loadMannequin(gender) {
   currentMannequin = mannequin;
 
   stateManager.setGender(gender);
-
-  sceneManager.fitCameraToObject(mannequin);
 }
 
-function populateSliders(gender) {
-
-  const config = garmentConfig[gender];
-
-  populateCategory("top", config.top, gender);
-  populateCategory("bottom", config.bottom, gender);
-  populateCategory("jacket", config.jacket, gender);
-  populateCategory("dress", config.dress, gender);
-}
-
-function populateCategory(category, items, gender) {
-
-  const slider = document.getElementById(category + "-slider");
-  if (!slider) return;
-
-  slider.innerHTML = "";
-
-  items.forEach(name => {
-
-    const card = document.createElement("div");
-    card.className = "garment-card";
-
-    const img = document.createElement("img");
-    img.src = `/vp-configurator/assets/${gender}/${category}/${name}.png`;
-
-    card.appendChild(img);
-
-    card.onclick = async () => {
-
-      document
-        .querySelectorAll(`#${category}-slider .garment-card`)
-        .forEach(c => c.classList.remove("active"));
-
-      card.classList.add("active");
-
-      await loadGarment(category, name + ".glb");
-    };
-
-    slider.appendChild(card);
-  });
-}
-
-async function loadGarment(type, fileName) {
-
-  const gender = stateManager.getState().gender;
-  const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
-
-  const model = await modelLoader.loadModel(path);
-
-  if (garments[type]) {
-    sceneManager.remove(garments[type]);
-  }
-
-  model.traverse(child => {
-    if (child.isMesh) {
-      child.material.transparent = true;
-      child.material.opacity = 0;
-    }
-  });
-
-  garments[type] = model;
-  sceneManager.add(model);
-
-  fadeIn(model);
-}
-
-function fadeIn(object) {
-
-  let opacity = 0;
-
-  function animate() {
-    opacity += 0.05;
-
-    object.traverse(child => {
-      if (child.isMesh) {
-        child.material.opacity = opacity;
-      }
-    });
-
-    if (opacity < 1) {
-      requestAnimationFrame(animate);
-    }
-  }
-
-  animate();
-}
+/* ================= COLOR ================= */
 
 function changeColor(type, value) {
-
   if (!garments[type]) return;
 
-  garments[type].traverse(child => {
+  garments[type].traverse((child) => {
     if (child.isMesh) {
       child.material.color.set(value);
     }
   });
 }
 
-function setMode(mode) {
-
-  const mix = document.getElementById("mix-section");
-  const dress = document.getElementById("dress-section");
-
-  if (mode === "mix") {
-    mix.style.display = "block";
-    dress.style.display = "none";
-  } else {
-    mix.style.display = "none";
-    dress.style.display = "block";
-  }
-}
-
-async function switchGender(gender) {
-
-  await loadMannequin(gender);
-
-  Object.keys(garments).forEach(key => {
-    if (garments[key]) {
-      sceneManager.remove(garments[key]);
-      garments[key] = null;
-    }
-  });
-
-  populateSliders(gender);
-}
-
-window.addEventListener("keydown", (e) => {
-
-  const distance = 4;
-
-  switch (e.key) {
-    case "2": moveCamera(0, 1.2, distance); break;
-    case "8": moveCamera(0, 1.2, -distance); break;
-    case "4": moveCamera(-distance, 1.2, 0); break;
-    case "6": moveCamera(distance, 1.2, 0); break;
-  }
-});
-
-function moveCamera(x, y, z) {
-  sceneManager.camera.position.set(x, y, z);
-  sceneManager.camera.lookAt(0, 1.2, 0);
-}
-
-document.getElementById("bgColorPicker")?.addEventListener("input", (e) => {
-  sceneManager.renderer.setClearColor(e.target.value);
-});
+/* ================= HDR ================= */
 
 document.getElementById("hdrIntensity")?.addEventListener("input", (e) => {
   const value = parseFloat(e.target.value);
 
-  sceneManager.scene.traverse(child => {
+  sceneManager.scene.traverse((child) => {
     if (child.isMesh && child.material.envMapIntensity !== undefined) {
       child.material.envMapIntensity = value;
     }
   });
 });
 
-window.exportImage = function () {
+/* ================= BACKGROUND ================= */
 
+document.getElementById("bgColorPicker")?.addEventListener("input", (e) => {
+  sceneManager.renderer.setClearColor(e.target.value);
+});
+
+/* ================= EXPORT ================= */
+
+function exportImage() {
   const size = parseInt(document.getElementById("resolutionSelect").value);
 
   const renderer = sceneManager.renderer;
@@ -252,8 +110,25 @@ window.exportImage = function () {
   link.click();
 
   renderer.setSize(originalSize.x, originalSize.y);
-};
+}
 
-window.switchGender = switchGender;
-window.setMode = setMode;
+/* ================= CAMERA SHORTCUTS ================= */
+
+window.addEventListener("keydown", (e) => {
+  const distance = 4;
+
+  switch (e.key) {
+    case "2": sceneManager.camera.position.set(0, 1.5, distance); break;
+    case "8": sceneManager.camera.position.set(0, 1.5, -distance); break;
+    case "4": sceneManager.camera.position.set(-distance, 1.5, 0); break;
+    case "6": sceneManager.camera.position.set(distance, 1.5, 0); break;
+  }
+
+  sceneManager.camera.lookAt(0, 1.2, 0);
+});
+
+/* ================= GLOBAL EXPORT ================= */
+
+window.switchGender = loadMannequin;
 window.changeColor = changeColor;
+window.exportImage = exportImage;
