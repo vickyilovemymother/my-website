@@ -1,5 +1,5 @@
-import { GLTFLoader } from "three/examples/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/examples/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 export class ModelLoader {
   constructor() {
@@ -10,8 +10,14 @@ export class ModelLoader {
     this.loader.setDRACOLoader(dracoLoader);
   }
 
-  async loadModel(path) {
-    const gltf = await this.loader.loadAsync(path);
-    return gltf.scene;
+  async load(path) {
+    return new Promise((resolve, reject) => {
+      this.loader.load(
+        path,
+        (gltf) => resolve(gltf.scene),
+        undefined,
+        (error) => reject(error)
+      );
+    });
   }
 }
