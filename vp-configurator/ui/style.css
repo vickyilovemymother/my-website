@@ -1,6 +1,13 @@
-.vp-app { display: flex; width: 100vw; height: 100vh; background: #111; color: white; }
-.side-panel { width: 300px; padding: 20px; background: rgba(0,0,0,0.8); border-right: 1px solid #333; overflow-y: auto; }
-#canvas-container { flex-grow: 1; position: relative; }
-.thumb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.thumb-item { cursor: pointer; border: 1px solid #444; padding: 5px; text-align: center; }
-.thumb-item img { width: 100%; border-radius: 4px; }
+body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: #000; overflow: hidden; }
+.vp-engine { display: flex; width: 100%; height: 100%; }
+
+.panel { width: 320px; background: rgba(20,20,20,0.95); border: 1px solid #333; padding: 20px; z-index: 10; color: white; }
+#canvas-container { flex-grow: 1; background: radial-gradient(circle, #333 0%, #000 100%); }
+
+.thumb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; overflow-y: auto; max-height: 70vh; }
+.thumb-card { background: #222; border: 1px solid #444; border-radius: 4px; padding: 5px; cursor: pointer; text-align: center; }
+.thumb-card img { width: 100%; height: auto; display: block; }
+.thumb-card span { font-size: 10px; text-transform: uppercase; }
+
+.color-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #222; padding: 8px; border-radius: 4px; }
+input[type="color"] { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
