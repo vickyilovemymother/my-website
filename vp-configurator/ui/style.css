@@ -1,0 +1,6 @@
+.vp-app { display: flex; width: 100vw; height: 100vh; background: #111; color: white; }
+.side-panel { width: 300px; padding: 20px; background: rgba(0,0,0,0.8); border-right: 1px solid #333; overflow-y: auto; }
+#canvas-container { flex-grow: 1; position: relative; }
+.thumb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.thumb-item { cursor: pointer; border: 1px solid #444; padding: 5px; text-align: center; }
+.thumb-item img { width: 100%; border-radius: 4px; }
