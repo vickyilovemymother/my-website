@@ -1,24 +1,26 @@
 export class StateManager {
-  constructor() {
-    this.state = {
-      gender: "men",
-      mode: "mix"
-    };
-  }
+    constructor() {
+        this.state = {
+            gender: 'Men', // Default
+            viewMode: 'mix', // 'mix' or 'dress'
+            activeItems: {
+                top: null,
+                bottom: null,
+                jacket: null,
+                comboset: null
+            },
+            colors: {
+                top: '#ffffff',
+                bottom: '#ffffff',
+                jacket: '#ffffff'
+            }
+        };
+    }
 
-  setGender(gender) {
-    this.state.gender = gender;
-  }
-
-  getGender() {
-    return this.state.gender;
-  }
-
-  setMode(mode) {
-    this.state.mode = mode;
-  }
-
-  getMode() {
-    return this.state.mode;
-  }
+    updateState(key, value) {
+        this.state[key] = value;
+        console.log("State Updated:", this.state);
+        // You can trigger a CustomEvent here for the UI to listen to
+        window.dispatchEvent(new CustomEvent('stateChanged', { detail: this.state }));
+    }
 }
