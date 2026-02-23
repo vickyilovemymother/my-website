@@ -1,0 +1,14 @@
+{
+  "Men": {
+    "Top": [{"id": "m_t_01", "file": "Top01.glb", "thumb": "Top01.png", "name": "Classic Tee"}],
+    "Bottom": [{"id": "m_b_01", "file": "Pant01.glb", "thumb": "Pant01.png", "name": "Slim Chino"}],
+    "Jacket": [],
+    "Comboset": []
+  },
+  "Women": {
+    "Top": [{"id": "w_t_01", "file": "Top01.glb", "thumb": "Top01.png", "name": "Silk Blouse"}],
+    "Bottom": [],
+    "Jacket": [],
+    "Comboset": [{"id": "w_c_01", "file": "Dress01.glb", "thumb": "Dress01.png", "name": "Evening Dress"}]
+  }
+}
