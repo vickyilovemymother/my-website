@@ -6,21 +6,13 @@ export class ModelLoader {
     constructor() {
         this.loader = new GLTFLoader();
         const dracoLoader = new DRACOLoader();
-        
-        // FIX: Point this to your root directory where draco files are
-        // GitHub Pages requires the absolute relative path
-        dracoLoader.setDecoderPath('./'); 
-        
+        dracoLoader.setDecoderPath('./'); // Ensure draco_decoder.js is in root
         this.loader.setDRACOLoader(dracoLoader);
     }
 
-    async load(path) {
+    load(path) {
         return new Promise((resolve, reject) => {
-            this.loader.load(path, 
-                (gltf) => resolve(gltf),
-                (xhr) => { console.log((xhr.loaded / xhr.total * 100) + '% loaded'); },
-                (error) => reject(error)
-            );
+            this.loader.load(path, (gltf) => resolve(gltf), undefined, (err) => reject(err));
         });
     }
 }
