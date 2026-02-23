@@ -1,49 +1,38 @@
 export class GarmentController {
-    constructor(scene, stateManager) {
+    constructor(scene) {
         this.scene = scene;
-        this.state = stateManager;
-        this.loader = new ModelLoader(); 
+        this.activeGarments = { top: null, bottom: null, jacket: null, comboset: null };
     }
 
-    async loadGarment(category, fileName) {
-        const gender = this.state.state.gender;
+    async addGarment(gender, category, fileName) {
+        const loader = new THREE.GLTFLoader();
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('./draco/'); // Path to your draco folder
+        loader.setDRACOLoader(dracoLoader);
+
         const path = `./assets/${gender}/${category}/${fileName}`;
 
-        // 1. Clear logic: If loading a full dress, remove individual pieces
+        // INNOVATION: Exclusive Mode Logic
         if (category === 'Comboset') {
-            this.removeGarment('top');
-            this.removeGarment('bottom');
-            this.removeGarment('jacket');
+            this.remove('top'); this.remove('bottom'); this.remove('jacket');
         } else {
-            this.removeGarment('comboset');
+            this.remove('comboset');
         }
 
-        // 2. Remove previous item in this category
-        this.removeGarment(category.toLowerCase());
+        // Remove previous item in the SAME category
+        this.remove(category.toLowerCase());
 
-        // 3. Load New
-        const gltf = await this.loader.load(path);
-        const model = gltf.scene;
-        
-        // Innovation: Apply current state color immediately upon load
-        this.applyColorToModel(model, this.state.state.colors[category.toLowerCase()]);
-
-        this.scene.add(model);
-        this.state.state.activeItems[category.toLowerCase()] = model;
-    }
-
-    removeGarment(cat) {
-        const existing = this.state.state.activeItems[cat];
-        if (existing) {
-            this.scene.remove(existing);
-            this.state.state.activeItems[cat] = null;
-        }
-    }
-
-    applyColorToModel(model, hex) {
-        if(!hex) return;
-        model.traverse(node => {
-            if (node.isMesh) node.material.color.set(hex);
+        loader.load(path, (gltf) => {
+            const model = gltf.scene;
+            this.scene.add(model);
+            this.activeGarments[category.toLowerCase()] = model;
         });
+    }
+
+    remove(cat) {
+        if (this.activeGarments[cat]) {
+            this.scene.remove(this.activeGarments[cat]);
+            this.activeGarments[cat] = null;
+        }
     }
 }
