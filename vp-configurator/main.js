@@ -1,19 +1,18 @@
 import { SceneManager } from './core/SceneManager.js';
-import { StateManager } from './core/StateManager.js';
+import { EnvironmentManager } from './core/EnvironmentManager.js';
 import { GarmentController } from './controllers/GarmentController.js';
-import { UIController } from './controllers/UIController.js';
 
-const state = new StateManager();
-const engine = new SceneManager();
-const garments = new GarmentController(engine.scene, state);
+const engine = new SceneManager('canvas-container');
+const env = new EnvironmentManager(engine.scene, engine.renderer);
+const garments = new GarmentController(engine.scene);
 
-// Initialize UI
-const ui = new UIController(state, (cat, file) => {
-    garments.loadGarment(cat, file);
-    engine.focusCamera(cat.toLowerCase()); // Auto-zoom innovation
-});
+// Load HDR Lighting
+env.loadHDR('./assets/mannequin/HC_VP.hdr');
 
-// Expose a global toggle for the Mannequin ON/OFF
-window.toggleMannequin = (isVisible) => {
-    engine.mannequin.visible = isVisible;
-};
+// Load Config and Build UI
+fetch('./config/garmentConfig.json')
+    .then(res => res.json())
+    .then(config => {
+        // Initialize UI Logic here to create thumbnails
+        // and link them to: garments.addGarment(gender, category, file);
+    });
