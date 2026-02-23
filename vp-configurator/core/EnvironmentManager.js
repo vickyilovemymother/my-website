@@ -1,26 +1,15 @@
-import * as THREE from "three";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-
 export class EnvironmentManager {
-  constructor(sceneManager) {
-    this.sceneManager = sceneManager;
-    this.hdrTexture = null;
-  }
+    constructor(scene, renderer) {
+        this.scene = scene;
+        this.renderer = renderer;
+    }
 
-  async loadHDR(path) {
-    const loader = new RGBELoader();
-
-    this.hdrTexture = await loader.loadAsync(path);
-    this.hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
-
-    this.sceneManager.scene.environment = this.hdrTexture;
-  }
-
-  setIntensity(value) {
-    this.sceneManager.scene.traverse((child) => {
-      if (child.isMesh && child.material.envMapIntensity !== undefined) {
-        child.material.envMapIntensity = value;
-      }
-    });
-  }
+    loadHDR(path) {
+        const loader = new THREE.RGBELoader();
+        loader.load(path, (texture) => {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            this.scene.environment = texture;
+            // Optional: this.scene.background = texture; // If you want to see the HDR background
+        });
+    }
 }
