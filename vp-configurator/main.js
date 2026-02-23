@@ -1,33 +1,19 @@
-// 1. STATE MANAGEMENT
-let config = {
-    gender: 'Men',
-    activeGarments: { top: null, bottom: null, jacket: null, set: null },
-    mannequinVisible: true
+import { SceneManager } from './core/SceneManager.js';
+import { StateManager } from './core/StateManager.js';
+import { GarmentController } from './controllers/GarmentController.js';
+import { UIController } from './controllers/UIController.js';
+
+const state = new StateManager();
+const engine = new SceneManager();
+const garments = new GarmentController(engine.scene, state);
+
+// Initialize UI
+const ui = new UIController(state, (cat, file) => {
+    garments.loadGarment(cat, file);
+    engine.focusCamera(cat.toLowerCase()); // Auto-zoom innovation
+});
+
+// Expose a global toggle for the Mannequin ON/OFF
+window.toggleMannequin = (isVisible) => {
+    engine.mannequin.visible = isVisible;
 };
-
-// 2. THE 3D LOADER FUNCTION
-function loadGarment(category, fileName) {
-    const path = `assets/clothes/${config.gender}/${category}/${fileName}.glb`;
-    
-    loader.load(path, (gltf) => {
-        // Remove existing item in that category
-        if(config.activeGarments[category]) {
-            scene.remove(config.activeGarments[category]);
-        }
-        
-        // Add new item and save reference
-        const model = gltf.scene;
-        scene.add(model);
-        config.activeGarments[category] = model;
-    });
-}
-
-// 3. COLOR UPDATE FUNCTION
-function changeColor(category, hex) {
-    const model = config.activeGarments[category];
-    if (model) {
-        model.traverse((node) => {
-            if (node.isMesh) node.material.color.set(hex);
-        });
-    }
-}
