@@ -1,50 +1,49 @@
 export class GarmentController {
-  constructor(sceneManager, modelLoader, stateManager) {
-    this.sceneManager = sceneManager;
-    this.modelLoader = modelLoader;
-    this.stateManager = stateManager;
-    this.items = {};
-  }
-
-  async load(type, fileName) {
-    const gender = this.stateManager.getGender();
-
-    const path = `/vp-configurator/assets/${gender}/${type}/${fileName}`;
-
-    const model = await this.modelLoader.load(path);
-
-    if (this.items[type]) {
-      this.sceneManager.remove(this.items[type]);
+    constructor(scene, stateManager) {
+        this.scene = scene;
+        this.state = stateManager;
+        this.loader = new ModelLoader(); 
     }
 
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.material.transparent = true;
-        child.material.opacity = 0;
-      }
-    });
+    async loadGarment(category, fileName) {
+        const gender = this.state.state.gender;
+        const path = `./assets/${gender}/${category}/${fileName}`;
 
-    this.sceneManager.add(model);
-    this.items[type] = model;
-
-    this.fadeIn(model);
-  }
-
-  fadeIn(object) {
-    let opacity = 0;
-
-    const animate = () => {
-      opacity += 0.05;
-
-      object.traverse((child) => {
-        if (child.isMesh) {
-          child.material.opacity = opacity;
+        // 1. Clear logic: If loading a full dress, remove individual pieces
+        if (category === 'Comboset') {
+            this.removeGarment('top');
+            this.removeGarment('bottom');
+            this.removeGarment('jacket');
+        } else {
+            this.removeGarment('comboset');
         }
-      });
 
-      if (opacity < 1) requestAnimationFrame(animate);
-    };
+        // 2. Remove previous item in this category
+        this.removeGarment(category.toLowerCase());
 
-    animate();
-  }
+        // 3. Load New
+        const gltf = await this.loader.load(path);
+        const model = gltf.scene;
+        
+        // Innovation: Apply current state color immediately upon load
+        this.applyColorToModel(model, this.state.state.colors[category.toLowerCase()]);
+
+        this.scene.add(model);
+        this.state.state.activeItems[category.toLowerCase()] = model;
+    }
+
+    removeGarment(cat) {
+        const existing = this.state.state.activeItems[cat];
+        if (existing) {
+            this.scene.remove(existing);
+            this.state.state.activeItems[cat] = null;
+        }
+    }
+
+    applyColorToModel(model, hex) {
+        if(!hex) return;
+        model.traverse(node => {
+            if (node.isMesh) node.material.color.set(hex);
+        });
+    }
 }
