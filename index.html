@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigneshwaran Pugazhenthi | Principal R&D Technologist</title>
+    <meta name="description" content="Principal R&D Technologist — Bridging AI, 3D Fashion, and Automation. 10+ years building the future of digital experiences.">
+    <meta name="keywords" content="Vigneshwaran Pugazhenthi, R&D Technologist, Avataar, 3D Fashion, Digital Architect, Virtual Fashion, Digital Transformation, AI Automation">
+    <meta name="author" content="Vigneshwaran Pugazhenthi">
+    <link rel="canonical" href="https://vickylive.com">
+
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="Vigneshwaran Pugazhenthi | Principal R&D Technologist">
+    <meta property="og:description" content="Bridging AI, 3D Fashion, and Automation. 10+ years building the future of digital experiences.">
+    <meta property="og:url" content="https://vickylive.com">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://vickylive.com/assets/images/home/VP.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vigneshwaran Pugazhenthi | Principal R&D Technologist">
+    <meta name="twitter:description" content="Bridging AI, 3D Fashion, and Automation. 10+ years building the future of digital experiences.">
+    <meta name="twitter:image" content="https://vickylive.com/assets/images/home/VP.jpg">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Vigneshwaran Pugazhenthi",
+      "jobTitle": "Principal R&D Technologist",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Avataar"
+      },
+      "url": "https://vickylive.com",
+      "sameAs": [
+        "https://www.linkedin.com/in/vickyilovemymother",
+        "https://www.instagram.com/VickyILoveMyMother/",
+        "https://x.com/VickyILoveMyMom",
+        "https://www.youtube.com/@vickyilovemymother1625",
+        "https://www.facebook.com/search/people/?q=VickyILoveMyMother"
+      ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg: #05050f;
+            --bg2: #0a0a1a;
+            --text: #ffffff;
+            --muted: #8888aa;
+            --c1: #00d4ff;
+            --c2: #7c3aff;
+            --c3: #ff00ff;
+            --c4: #00f5d4;
+            --c5: #ff6b35;
+            --glow1: rgba(0,212,255,0.25);
+            --glow2: rgba(124,58,255,0.25);
+            --glow3: rgba(255,0,255,0.15);
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.08);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;cursor:none;}
+        ::-webkit-scrollbar{width:6px;}
+        ::-webkit-scrollbar-track{background:#0a0a1a;}
+        ::-webkit-scrollbar-thumb{background:linear-gradient(var(--c2),var(--c1));border-radius:3px;}
+
+        /* CANVAS BG */
+        #bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+        /* AURORA ORBS */
+        .aurora{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.12;pointer-events:none;z-index:0;animation:auroraDrift 20s ease-in-out infinite alternate;}
+        .aurora-1{width:600px;height:600px;background:var(--c2);top:-100px;left:-150px;animation-delay:0s;}
+        .aurora-2{width:500px;height:500px;background:var(--c1);top:30%;right:-100px;animation-delay:-7s;}
+        .aurora-3{width:400px;height:400px;background:var(--c3);bottom:10%;left:20%;animation-delay:-14s;}
+        @keyframes auroraDrift{0%{transform:translate(0,0) scale(1);}100%{transform:translate(40px,30px) scale(1.1);}}
+
+        /* CURSOR */
+        .cursor{width:22px;height:22px;border:2px solid var(--c1);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s;mix-blend-mode:normal;}
+        .cursor-dot{width:6px;height:6px;background:var(--c1);border-radius:50%;position:fixed;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:background .3s;}
+        .cursor.hovered{width:50px;height:50px;border-color:var(--c3);background:rgba(255,0,255,0.08);}
+
+        /* EVERYTHING ON TOP OF CANVAS */
+        nav,.social-sidebar,section,.tech-strip,.port-wrapper,footer{position:relative;z-index:10;}
+
+        /* NAV */
+        .nav{position:fixed;top:0;left:0;width:100%;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;z-index:100;background:rgba(5,5,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);}
+        .nav::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,var(--c2),var(--c1),var(--c4),var(--c3));opacity:0.5;}
+        .logo-img{height:46px;width:auto;}
+        .nav-links{display:flex;gap:32px;align-items:center;}
+        .nav-link{color:rgba(255,255,255,0.7);text-decoration:none;font-family:'Space Grotesk';font-size:13px;text-transform:uppercase;letter-spacing:1.5px;transition:.3s;position:relative;}
+        .nav-link::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:linear-gradient(90deg,var(--c1),var(--c4));transition:.3s;}
+        .nav-link:hover{color:#fff;}
+        .nav-link:hover::after{width:100%;}
+        .nav-btn{border:1px solid rgba(0,212,255,0.4);padding:9px 22px;border-radius:30px;color:var(--c1);background:rgba(0,212,255,0.05);}
+        .nav-btn:hover{background:rgba(0,212,255,0.15);box-shadow:0 0 20px var(--glow1);}
+        .nav-btn::after{display:none;}
+
+        /* SOCIAL */
+        .social-sidebar{position:fixed;right:28px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;z-index:90;}
+        .social-link{width:42px;height:42px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);font-size:16px;text-decoration:none;transition:.4s;backdrop-filter:blur(10px);}
+        .social-link:hover{color:#000;transform:scale(1.1) translateX(-4px);}
+        .social-link:nth-child(1):hover{background:var(--c1);box-shadow:0 0 20px var(--glow1);}
+        .social-link:nth-child(2):hover{background:var(--c3);box-shadow:0 0 20px var(--glow3);}
+        .social-link:nth-child(3):hover{background:#1877f2;box-shadow:0 0 20px rgba(24,119,242,0.4);}
+        .social-link:nth-child(4):hover{background:#fff;}
+        .social-link:nth-child(5):hover{background:#ff0000;box-shadow:0 0 20px rgba(255,0,0,0.4);}
+        .social-link:nth-child(6):hover{background:var(--c4);box-shadow:0 0 20px rgba(0,245,212,0.4);}
+
+        /* HERO */
+        .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:160px 10% 100px;}
+        .hero-eyebrow{font-family:'Space Grotesk';font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;margin-bottom:24px;display:inline-flex;align-items:center;gap:12px;}
+        .hero-eyebrow span{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-eyebrow::before{content:'';width:40px;height:1px;background:linear-gradient(90deg,var(--c1),var(--c2));}
+        .hero h1{font-family:'Outfit';font-size:clamp(42px,6vw,88px);line-height:1.05;font-weight:800;margin-bottom:28px;letter-spacing:-1px;}
+        .grad-text{background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 40%,var(--c3) 70%,var(--c4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:gradShift 4s ease infinite;}
+        @keyframes gradShift{0%,100%{background-position:0%;}50%{background-position:100%;}}
+        .typewriter-wrap{display:inline;color:var(--c1);}
+        .hero-sub{color:var(--muted);font-size:18px;line-height:1.7;max-width:700px;margin-bottom:20px;}
+        .hero-sub strong{color:rgba(255,255,255,0.9);}
+        .cta-group{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;}
+        .btn-primary{padding:16px 36px;border-radius:50px;font-family:'Space Grotesk';font-weight:700;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--c2),var(--c1));color:#fff;box-shadow:0 0 30px var(--glow2),0 0 60px rgba(0,212,255,0.1);transition:.4s;position:relative;overflow:hidden;}
+        .btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:.6s;}
+        .btn-primary:hover::before{left:100%;}
+        .btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 50px var(--glow2),0 0 80px rgba(0,212,255,0.2);}
+        .btn-secondary{padding:16px 36px;border-radius:50px;font-family:'Space Grotesk';font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;border:1px solid var(--glass-border);color:rgba(255,255,255,0.8);background:var(--glass);backdrop-filter:blur(10px);transition:.4s;}
+        .btn-secondary:hover{border-color:rgba(0,212,255,0.4);color:#fff;background:rgba(0,212,255,0.05);transform:translateY(-3px);}
+
+        /* STATS */
+        .stats-bar{padding:50px 10%;background:rgba(10,10,26,0.8);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);backdrop-filter:blur(10px);}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;}
+        .stat-item{text-align:center;}
+        .stat-num{font-family:'Outfit';font-size:clamp(36px,4vw,58px);font-weight:800;line-height:1;margin-bottom:8px;}
+        .stat-num.c1{background:linear-gradient(135deg,var(--c1),var(--c4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .stat-num.c2{background:linear-gradient(135deg,var(--c2),var(--c3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .stat-num.c3{background:linear-gradient(135deg,var(--c3),var(--c5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .stat-num.c4{background:linear-gradient(135deg,var(--c4),var(--c1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .stat-label{color:var(--muted);font-size:13px;font-family:'Space Grotesk';letter-spacing:1px;text-transform:uppercase;}
+
+        /* SECTION COMMON */
+        section{padding:110px 10%;}
+        .sec-label{display:inline-flex;align-items:center;gap:12px;font-family:'Space Grotesk';font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--c1);margin-bottom:60px;}
+        .sec-label::before{content:'';width:30px;height:1px;background:linear-gradient(90deg,var(--c1),var(--c2));}
+        .sec-label::after{content:'';flex:0 0 30px;height:1px;background:linear-gradient(90deg,var(--c2),transparent);}
+
+        /* ABOUT */
+        .about-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:70px;align-items:start;}
+        .about-img-wrap{position:sticky;top:100px;border-radius:20px;overflow:hidden;height:580px;padding:3px;background:linear-gradient(135deg,var(--c2),var(--c1),var(--c4),var(--c3));box-shadow:0 0 60px rgba(124,58,255,0.3),0 0 120px rgba(0,212,255,0.1);}
+        .about-img-inner{width:100%;height:100%;border-radius:18px;overflow:hidden;}
+        .about-img{width:100%;height:100%;object-fit:cover;transition:.6s;filter:grayscale(100%);}
+        .about-img-wrap:hover .about-img{transform:scale(1.03);filter:grayscale(0%);}
+        .about-h2{font-family:'Outfit';font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.2;margin-bottom:24px;}
+        .about-p{color:var(--muted);line-height:1.9;margin-bottom:20px;font-size:16px;}
+        .about-p strong{color:#fff;}
+
+        /* CARDS */
+        .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px;}
+        .card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:36px;backdrop-filter:blur(12px);transition:.4s;transform-style:preserve-3d;position:relative;overflow:hidden;}
+        .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--card-color,var(--c1)),transparent);opacity:0;transition:.4s;}
+        .card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 30px var(--card-glow,var(--glow1));}
+        .card:hover::before{opacity:1;}
+        .card:hover .card-icon{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.3);}
+        .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:20px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);transition:.4s;}
+        .card h3{font-family:'Space Grotesk';font-size:18px;font-weight:600;margin-bottom:12px;color:#fff;}
+        .card p{color:var(--muted);font-size:14px;line-height:1.7;}
+        .card:nth-child(1){--card-color:var(--c1);--card-glow:var(--glow1);}
+        .card:nth-child(1) .card-icon{color:var(--c1);}
+        .card:nth-child(2){--card-color:var(--c2);--card-glow:var(--glow2);}
+        .card:nth-child(2) .card-icon{color:var(--c2);}
+        .card:nth-child(3){--card-color:var(--c3);--card-glow:var(--glow3);}
+        .card:nth-child(3) .card-icon{color:var(--c3);}
+        .card:nth-child(4){--card-color:var(--c4);--card-glow:rgba(0,245,212,0.2);}
+        .card:nth-child(4) .card-icon{color:var(--c4);}
+        .card:nth-child(5){--card-color:var(--c5);--card-glow:rgba(255,107,53,0.2);}
+        .card:nth-child(5) .card-icon{color:var(--c5);}
+        .card:nth-child(6){--card-color:var(--c1);--card-glow:var(--glow1);}
+        .card:nth-child(6) .card-icon{color:var(--c1);}
+        .card:nth-child(7){--card-color:var(--c2);--card-glow:var(--glow2);}
+        .card:nth-child(7) .card-icon{color:var(--c2);}
+        .card:nth-child(8){--card-color:var(--c3);--card-glow:var(--glow3);}
+        .card:nth-child(8) .card-icon{color:var(--c3);}
+
+        /* TECH MARQUEE */
+        .tech-strip{padding:36px 0;background:rgba(5,5,20,0.9);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);overflow:hidden;white-space:nowrap;}
+        .marquee-track{display:inline-block;animation:marquee 25s linear infinite;}
+        .tech-item{display:inline-flex;align-items:center;gap:10px;margin:0 36px;font-family:'Space Grotesk';font-size:20px;font-weight:600;color:#2a2a4a;}
+        .tech-item i{font-size:16px;}
+        .tech-item:nth-child(odd){color:#1e1e3a;}
+        .ti-blue i,.ti-blue{color:#00d4ff !important;opacity:0.8;}
+        .ti-violet i,.ti-violet{color:#7c3aff !important;opacity:0.8;}
+        .ti-magenta i,.ti-magenta{color:#ff00ff !important;opacity:0.8;}
+        .ti-teal i,.ti-teal{color:#00f5d4 !important;opacity:0.8;}
+        .ti-orange i,.ti-orange{color:#ff6b35 !important;opacity:0.8;}
+        @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+        /* PORTFOLIO PANELS */
+        .port-wrapper{overflow:hidden;width:100%;height:100vh;position:relative;}
+        .port-container{width:400%;height:100%;display:flex;flex-wrap:nowrap;}
+        .proj-panel{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;padding:0 3%;border-right:1px solid var(--glass-border);position:relative;}
+        .proj-panel::before{content:'';position:absolute;inset:0;opacity:0.06;}
+        .panel-1::before{background:radial-gradient(circle at 70% 50%,var(--c1),transparent 60%);}
+        .panel-2::before{background:radial-gradient(circle at 70% 50%,var(--c2),transparent 60%);}
+        .panel-3::before{background:radial-gradient(circle at 70% 50%,var(--c3),transparent 60%);}
+        .panel-4::before{background:radial-gradient(circle at 70% 50%,var(--c4),transparent 60%);}
+        .proj-content{max-width:1800px;width:100%;padding:0 1%;margin:0 auto;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3%;}
+        .proj-content > div:first-child { flex: 1 1 50%; width: 50%; padding-right: 0%; }
+        .proj-tag{font-family:'Space Grotesk';font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;}
+        .panel-1 .proj-tag{color:var(--c1);}
+        .panel-2 .proj-tag{color:var(--c2);}
+        .panel-3 .proj-tag{color:var(--c3);}
+        .panel-4 .proj-tag{color:var(--c4);}
+        .proj-h2{font-family:'Outfit';font-size:clamp(36px,4vw,64px);font-weight:800;line-height:1.1;margin-bottom:16px;}
+        .proj-p{color:var(--muted);line-height:1.8;margin-bottom:16px;font-size:clamp(16px, 1.5vw, 18px);}
+        .proj-ul{list-style:none;margin-top:0px;text-align:left;}
+        .proj-ul li{color:#7a7a99;padding:8px 0;font-size:clamp(15px, 1.5vw, 16px);display:flex;align-items:flex-start;gap:12px;line-height:1.6;}
+        .proj-ul li::before{content:'';width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:8px;}
+        .panel-1 .proj-ul li::before{background:var(--c1);}
+        .panel-2 .proj-ul li::before{background:var(--c2);}
+        .panel-3 .proj-ul li::before{background:var(--c3);}
+        .panel-4 .proj-ul li::before{background:var(--c4);}
+        .proj-visual{flex: 1 1 50%; width: 50%; height:auto-fit; min-height:400px; border-radius:20px; overflow:hidden; border:1px solid var(--glass-border); position:relative; background:rgba(0,0,0,0.6); box-shadow: 0 20px 80px rgba(0,0,0,0.5);}
+        .proj-visual::after{content:'';position:absolute;inset:0;border-radius:20px;border:1px solid transparent;transition:.4s;pointer-events:none;}
+        .panel-1 .proj-visual::after{box-shadow:inset 0 0 0 2px rgba(0,212,255,0.3);}
+        .panel-2 .proj-visual::after{box-shadow:inset 0 0 0 2px rgba(124,58,255,0.3);}
+        .panel-3 .proj-visual::after{box-shadow:inset 0 0 0 2px rgba(255,0,255,0.3);}
+        .panel-4 .proj-visual::after{box-shadow:inset 0 0 0 2px rgba(0,245,212,0.3);}
+        .proj-img{width:100%;height:100%;object-fit:cover;opacity:.9;transition:.6s ease-out;}
+        .proj-panel:hover .proj-img{opacity:1;transform:scale(0.99);}
+
+        /* LEADERSHIP */
+        .lead-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;}
+        .col-head{margin-bottom:36px;}
+        .col-head h4{font-family:'Space Grotesk';font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--c1);margin-bottom:8px;}
+        .col-head h2{font-family:'Outfit';font-size:28px;font-weight:700;}
+        .col-head p{color:var(--muted);font-size:14px;margin-top:8px;}
+        .timeline{position:relative;padding-left:32px;border-left:1px solid var(--glass-border);}
+        .t-item{margin-bottom:48px;position:relative;opacity:.4;transition:.4s;}
+        .t-item.active{opacity:1;}
+        .t-dot{position:absolute;left:-38px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--c1);background:var(--bg);transition:.4s;box-shadow:0 0 0 0 var(--glow1);}
+        .t-item.active .t-dot{background:var(--c1);box-shadow:0 0 12px var(--glow1);}
+        .t-year{font-family:'Space Grotesk';color:var(--c1);font-weight:700;font-size:13px;margin-bottom:4px;}
+        .t-title{font-size:17px;font-weight:600;color:#fff;margin-bottom:4px;}
+        .t-desc{color:var(--muted);font-size:13px;line-height:1.6;}
+        .col-2 .t-dot{border-color:var(--c4);}
+        .col-2 .t-item.active .t-dot{background:var(--c4);box-shadow:0 0 12px rgba(0,245,212,0.4);}
+        .col-2 .t-year{color:var(--c4);}
+        .col-2 .col-head h4{color:var(--c4);}
+
+        /* MAP */
+        .map-s{padding:0;height:480px;width:100%;overflow:hidden;filter:grayscale(100%) invert(90%) contrast(0.9);}
+        .map-s iframe{width:100%;height:100%;border:0;}
+
+        /* FOOTER */
+        .footer{padding:100px 10% 60px;background:rgba(5,5,15,0.95);border-top:1px solid var(--glass-border);text-align:center;}
+        .big-cta{font-family:'Outfit';font-size:clamp(32px,7vw,90px);font-weight:800;text-decoration:none;display:block;margin-bottom:50px;line-height:1;background:linear-gradient(135deg,#fff 0%,var(--c1) 40%,var(--c2) 70%,var(--c3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;transition:.4s;background-size:200%;animation:gradShift 5s ease infinite;}
+        .big-cta:hover{transform:scale(1.02);}
+        .footer-links{display:flex;justify-content:center;gap:40px;margin-bottom:40px;font-family:'Space Grotesk';}
+        .footer-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:.3s;}
+        .footer-links a:hover{color:var(--c1);}
+        .footer-copy{color:#2a2a4a;font-size:12px;}
+
+        /* RESPONSIVE */
+        @media(max-width:1024px){
+            .proj-content{gap:40px;}
+            .about-grid{grid-template-columns:1fr 1fr; gap:40px;}
+            .lead-grid{grid-template-columns:1fr; gap:50px;}
+            .about-img-wrap{height:450px;}
+        }
+        @media(max-width:992px){
+            .port-wrapper{height:auto !important;overflow:visible;}
+            .port-container{width:100% !important;flex-direction:column;height:auto !important;}
+            .proj-panel{width:100vw !important;height:auto !important;padding:80px 8%;border-right:none;border-bottom:1px solid var(--glass-border);}
+            .proj-content{grid-template-columns:1fr;text-align:center;}
+            .proj-ul{text-align:left;display:inline-block;margin:16px auto 0;}
+            .about-grid{grid-template-columns:1fr;}
+            .about-img-wrap{height:500px;position:relative;top:0;margin-bottom:30px;}
+            .lead-grid{grid-template-columns:1fr;}
+        }
+        @media(max-width:768px){
+            .social-sidebar{position:fixed;bottom:0;top:auto;right:0;left:0;transform:none;flex-direction:row;justify-content:center;background:rgba(5,5,15,0.95);padding:14px;border-top:1px solid var(--glass-border);}
+            .about-grid,.proj-content,.lead-grid{grid-template-columns:1fr;gap:40px;}
+            .stats-grid{grid-template-columns:repeat(2,1fr);}
+            .about-img-wrap{height:400px;position:relative;top:0;margin-bottom:20px;}
+            .nav-links{display:none;}
+            h1{font-size:42px;}
+            .hero{padding:140px 5% 60px;}
+            section{padding:80px 5%;}
+            .stats-bar{padding:30px 5%;}
+            .port-wrapper{height:auto !important;overflow:visible;}
+            .port-container{width:100% !important;flex-direction:column;height:auto !important;}
+            .proj-panel{width:100vw !important;height:auto !important;padding:60px 8%;border-right:none;border-bottom:1px solid var(--glass-border);}
+            .footer{padding:60px 5% 90px;}
+        }
+    </style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="aurora aurora-1"></div>
+<div class="aurora aurora-2"></div>
+<div class="aurora aurora-3"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<nav class="nav" id="mainNav">
+    <a href="#"><img src="assets/images/global/LogoVickyLive.png" alt="VP Logo" class="logo-img"></a>
+    <div class="nav-links">
+        <a href="#about" class="nav-link ht">About</a>
+        <a href="#expertise" class="nav-link ht">Expertise</a>
+        <a href="#leadership" class="nav-link ht">Journey</a>
+        <a href="portfolio.html" class="nav-link ht">Portfolio / Output</a>
+        <a href="vp-fashion-configurator/index.html" class="nav-link ht">AI Studio</a>
+        <a href="vp.ai-virtual-photoshoot/index.html" class="nav-link ht">Virtual Frameworks</a>
+    </div>
+</nav>
+
+<div class="social-sidebar">
+    <a href="https://www.linkedin.com/in/vickyilovemymother" target="_blank" class="social-link ht"><i class="fab fa-linkedin-in"></i></a>
+    <a href="https://www.instagram.com/VickyILoveMyMother/" target="_blank" class="social-link ht"><i class="fab fa-instagram"></i></a>
+    <a href="https://www.facebook.com/search/people/?q=VickyILoveMyMother" target="_blank" class="social-link ht"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://x.com/VickyILoveMyMom" target="_blank" class="social-link ht"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="https://www.youtube.com/@vickyilovemymother1625" target="_blank" class="social-link ht"><i class="fab fa-youtube"></i></a>
+    <a href="mailto:ilovemymother@vickylive.com" class="social-link ht"><i class="fas fa-envelope"></i></a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-eyebrow"><span>VIGNESHWARAN PUGAZHENTHI</span></div>
+    <h1>Bridging Creativity<br>&amp; <span class="grad-text">Artificial Intelligence.</span></h1>
+    <p class="hero-sub">
+        Principal R&amp;D Technologist at <strong>Avataar.ai</strong> &amp; Co-founder of <strong>Integrity People Trust</strong>.<br>
+        Transforming complex workflows into seamless digital experiences through<br>
+        Automation, AR, and Virtual Fashion —&nbsp;I am a&nbsp;<span class="typewriter-wrap" id="typewriter"></span>
+    </p>
+    <div class="cta-group">
+        <a href="vp.ai-virtual-photoshoot/index.html" class="btn-primary ht mag-btn"><i class="fas fa-wand-magic-sparkles"></i> Launch AI Studio</a>
+        <a href="portfolio.html" class="btn-secondary ht mag-btn"><i class="fas fa-layer-group"></i> View Full Portfolio</a>
+    </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-num c1" data-count="10" data-suffix="+">0</div>
+            <div class="stat-label">Years of Expertise</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num c2" data-count="99.7" data-suffix="%" data-decimal="1">0</div>
+            <div class="stat-label">Client Approval Rating</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num c3" data-count="70" data-suffix="%">0</div>
+            <div class="stat-label">Manual Effort Reduced</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num c4" data-count="5" data-suffix="+">0</div>
+            <div class="stat-label">Global Tech Partners</div>
+        </div>
+    </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+    <span class="sec-label">01 / The Architect</span>
+    <div class="about-grid">
+        <div class="about-img-wrap ht">
+            <div class="about-img-inner">
+                <img src="assets/images/home/VP.jpg" alt="Vigneshwaran Pugazhenthi" class="about-img">
+            </div>
+        </div>
+        <div class="about-text">
+            <h2 class="about-h2">Innovating the Future<br>of <span class="grad-text">Digital Fashion.</span></h2>
+            <p class="about-p">With over <strong>10 years of expertise</strong>, I specialize in replacing traditional fashion workflows with cutting-edge 3D, AI, and automation-driven solutions. My work focuses on transforming how fashion is designed, visualized, and delivered—bridging the gap between creative vision and technical execution while enabling speed, scalability, and precision across digital pipelines.</p>
+            <p class="about-p">Currently, I lead Research &amp; Development at <strong>Avataar.ai</strong>, where I architect and scale next-generation digital fashion systems. My role involves ensuring 3D garment assets are optimized and compatible across AR/VR platforms such as Snapchat, Meta, and Google AR. I have successfully spearheaded the transition from physical photoshoots to 3D Virtual Renders, achieving a <strong>99.7% approval rating</strong> while significantly reducing production time and costs.</p>
+            <p class="about-p">Beyond technology, I am the Co-Founder of <strong>Integrity People Trust</strong>, a nonprofit dedicated to empowering underprivileged youth through educational support, mentorship, digital literacy, and exposure to AI and emerging technologies.</p>
+            <p class="about-p">Integrity People Trust envisions a future where talent is never limited by circumstance—building a generation that is confident, skilled, and future-ready.</p>
+        </div>
+    </div>
+</section>
+
+<!-- EXPERTISE -->
+<section id="expertise">
+    <span class="sec-label">02 / Core Competencies</span>
+    <div class="cards-grid">
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-robot"></i></div>
+            <h3>RPA &amp; AI Automation</h3>
+            <p>Designed AI-powered automation scripts to enhance garment rendering, texture enhancements, and digital staging, reducing labor-intensive work by 70%.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-cube"></i></div>
+            <h3>3D Virtual Fashion</h3>
+            <p>Expert in CLO3D and Marvelous Designer. Spearheaded the transformation of 2D patterns into hyper-realistic 3D renders for global e-commerce clients.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-vr-cardboard"></i></div>
+            <h3>AR/VR Integration</h3>
+            <p>Ensuring 3D assets are optimized for Snapchat, Meta, and Google AR. Pioneered virtual try-on technology using real-time body tracking at scale.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Digital Transformation</h3>
+            <p>Implemented AI-driven Quality Control processes, reducing manual error rates by 80% and optimizing entire production pipelines for top-tier brands.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-chess-king"></i></div>
+            <h3>Leadership &amp; Problem Solving</h3>
+            <p>Driving teams through complex challenges by setting a clear vision, defining OKRs, and removing execution roadblocks. Mentoring teams to deliver at scale.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
+            <h3>Product Innovation</h3>
+            <p>Designing scalable, future-ready processes by blending fashion, technology, and automation. Refines workflows to create measurable, lasting impact.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>Quality Engineering</h3>
+            <p>Building robust QC frameworks powered by AI and data intelligence. Ensures compliance, accuracy, and consistency across large-scale production pipelines.</p>
+        </div>
+        <div class="card ht" data-tilt>
+            <div class="card-icon"><i class="fas fa-people-group"></i></div>
+            <h3>Mentorship &amp; Talent</h3>
+            <p>Empowering individuals and teams through hands-on mentoring and technical coaching. Focused on building self-driven teams that innovate boldly.</p>
+        </div>
+    </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="tech-strip">
+    <div class="marquee-track">
+        <span class="tech-item ti-blue"><i class="fas fa-cube"></i> CLO3D</span>
+        <span class="tech-item ti-violet"><i class="fas fa-code"></i> Python</span>
+        <span class="tech-item ti-teal"><i class="fas fa-robot"></i> Power Automate</span>
+        <span class="tech-item ti-magenta"><i class="fas fa-layer-group"></i> Blender</span>
+        <span class="tech-item ti-orange"><i class="fas fa-brain"></i> Generative AI</span>
+        <span class="tech-item ti-blue"><i class="fas fa-vr-cardboard"></i> Spark AR</span>
+        <span class="tech-item ti-violet"><i class="fas fa-camera"></i> Virtual Photography</span>
+        <span class="tech-item ti-teal"><i class="fas fa-shirt"></i> Marvelous Designer</span>
+        <span class="tech-item ti-magenta"><i class="fas fa-wand-magic-sparkles"></i> Stable Diffusion</span>
+        <span class="tech-item ti-orange"><i class="fas fa-microchip"></i> ComfyUI</span>
+        <!-- duplicate for seamless loop -->
+        <span class="tech-item ti-blue"><i class="fas fa-cube"></i> CLO3D</span>
+        <span class="tech-item ti-violet"><i class="fas fa-code"></i> Python</span>
+        <span class="tech-item ti-teal"><i class="fas fa-robot"></i> Power Automate</span>
+        <span class="tech-item ti-magenta"><i class="fas fa-layer-group"></i> Blender</span>
+        <span class="tech-item ti-orange"><i class="fas fa-brain"></i> Generative AI</span>
+        <span class="tech-item ti-blue"><i class="fas fa-vr-cardboard"></i> Spark AR</span>
+        <span class="tech-item ti-violet"><i class="fas fa-camera"></i> Virtual Photography</span>
+        <span class="tech-item ti-teal"><i class="fas fa-shirt"></i> Marvelous Designer</span>
+        <span class="tech-item ti-magenta"><i class="fas fa-wand-magic-sparkles"></i> Stable Diffusion</span>
+        <span class="tech-item ti-orange"><i class="fas fa-microchip"></i> ComfyUI</span>
+    </div>
+</div>
+
+<!-- PORTFOLIO SCROLL -->
+<div class="port-wrapper" id="work">
+    <div class="port-container">
+        <section class="proj-panel panel-1">
+            <div class="proj-content">
+                <div>
+                    <div class="proj-tag">AVATAAR • R&amp;D</div>
+                    <h2 class="proj-h2">Virtual Photoshoot<br>Transformation</h2>
+                    <p class="proj-p">Replaced traditional physical garment photoshoots with a 3D Virtual Renders solution, achieving industry-leading quality at scale.</p>
+                    <ul class="proj-ul">
+                        <li>Achieved 99.7% client approval rating across all deliveries.</li>
+                        <li>Reduced production turnaround time and costs significantly.</li>
+                        <li>Established a scalable digital asset pipeline for e-commerce.</li>
+                    </ul>
+                </div>
+                <div class="proj-visual ht"><img src="assets/images/portfolio/system/project1.jpg" class="proj-img" alt="Avataar Project"></div>
+            </div>
+        </section>
+        <section class="proj-panel panel-2">
+            <div class="proj-content">
+                <div>
+                    <div class="proj-tag">MYNTRA • GOOGLE • SAMSUNG</div>
+                    <h2 class="proj-h2">AR/VR &amp;<br>Fashion Implementation</h2>
+                    <p class="proj-p">Led major implementation projects for global tech giants, pioneering AR fashion experiences for millions of consumers.</p>
+                    <ul class="proj-ul">
+                        <li><strong>Google:</strong> Implementing AR/VR technology in Google-Fashion.</li>
+                        <li><strong>Samsung/Myntra:</strong> Transformed 2D patterns into high-quality 3D objects.</li>
+                        <li>Optimized low-poly 3D meshes for real-time AR performance.</li>
+                    </ul>
+                </div>
+                <div class="proj-visual ht"><img src="assets/images/portfolio/system/project2.jpg" class="proj-img" alt="AR VR Project"></div>
+            </div>
+        </section>
+        <section class="proj-panel panel-3">
+            <div class="proj-content">
+                <div>
+                    <div class="proj-tag">META • SNAPCHAT</div>
+                    <h2 class="proj-h2">Social Media<br>3D Integration</h2>
+                    <p class="proj-p">Enhancing 3D discovery &amp; shopping experiences by integrating AR/VR &amp; AI into the world's largest social platforms.</p>
+                    <ul class="proj-ul">
+                        <li>Developed animated 3D assets for AR interactions at scale.</li>
+                        <li>Created hyper-realistic 3D models for Facebook &amp; Instagram.</li>
+                        <li>Pioneered B2B &amp; B2C research for virtual fashion trends.</li>
+                    </ul>
+                </div>
+                <div class="proj-visual ht"><img src="assets/images/portfolio/system/project3.jpg" class="proj-img" alt="Social Project"></div>
+            </div>
+        </section>
+        <section class="proj-panel panel-4">
+            <div class="proj-content">
+                <div>
+                    <div class="proj-tag">PYTHON • AUTOMATION</div>
+                    <h2 class="proj-h2">AI Workflow<br>Engineering</h2>
+                    <p class="proj-p">Developed AI-powered automation scripts to streamline production workflows, reducing human intervention and increasing throughput.</p>
+                    <ul class="proj-ul">
+                        <li>Automated garment rendering and texture enhancements.</li>
+                        <li>Reduced manual intervention by 70% across all pipelines.</li>
+                        <li>Built end-to-end RPA integration using Power Automate.</li>
+                    </ul>
+                </div>
+                <div class="proj-visual ht"><img src="assets/images/portfolio/system/project4.jpg" class="proj-img" alt="Automation Project"></div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- LEADERSHIP -->
+<section id="leadership">
+    <span class="sec-label">04 / Leadership &amp; Impact</span>
+    <div class="lead-grid">
+        <div>
+            <div class="col-head">
+                <h4>Technical Leadership</h4>
+                <h2>Avataar.ai</h2>
+                <p>Leading cross-functional teams of designers, photographers, and e-commerce specialists toward innovation.</p>
+            </div>
+            <div class="timeline">
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2024 – Present</div><div class="t-title">Principal R&amp;D Technologist</div><div class="t-desc">Leading R&amp;D strategy, aligning technology with product goals. Spearheaded the shift from physical photoshoots to 3D Renders (99.7% approval).</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2022 – 2023</div><div class="t-title">Virtual Try-On &amp; AI Expansion</div><div class="t-desc">Led development of virtual try-on using real-time body tracking. Built Python-based AI tools to accelerate simulation workflows.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2020 – 2021</div><div class="t-title">Automation &amp; Workflow Innovation</div><div class="t-desc">Introduced AI-driven automation and RPA into garment staging and QC workflows, reducing manual effort significantly.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2018 – 2019</div><div class="t-title">AR/VR Implementation</div><div class="t-desc">Contributed to AR/VR fashion projects for Google and Meta ecosystems. Delivered optimized 3D assets for real-time rendering.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2016 – 2017</div><div class="t-title">Foundations in 3D &amp; R&amp;D</div><div class="t-desc">Worked on transforming 2D patterns into realistic 3D garments. Researched and built scalable 3D production pipelines.</div></div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="col-head">
+                <h4>Social Impact</h4>
+                <h2>Integrity People Trust</h2>
+                <p>Bridging the gap in education &amp; skill-building for underprivileged communities across India.</p>
+            </div>
+            <div class="timeline">
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2024 – Present</div><div class="t-title">Sustainable Impact &amp; Growth</div><div class="t-desc">Continued scaling mentorship and education programs with a focus on long-term measurable outcomes for youth.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2023</div><div class="t-title">AI &amp; Digital Transformation</div><div class="t-desc">Conducted workshops on AI and automation to make students future-ready. Strengthened mentor networks across cities.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2022</div><div class="t-title">Skill Development</div><div class="t-desc">Expanded initiatives to include skill-building sessions and exposure to emerging technologies like 3D and GenAI.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2020</div><div class="t-title">Education Support &amp; Mentorship</div><div class="t-desc">Sponsored education for students facing economic barriers. Established structured mentorship programs with measurable output.</div></div>
+                <div class="t-item"><div class="t-dot"></div><div class="t-year">2019</div><div class="t-title">Foundation &amp; Vision</div><div class="t-desc">Co-founded Integrity People Trust with a clear mission to support underprivileged students through education equity.</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MAP -->
+<div class="map-s">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5959578806746!2d80.21700907588877!3d13.124763211500087!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5264581352d3c1%3A0xc80ac04ea9ee8b69!2sVickyILoveMyMother!5e0!3m2!1sen!2sin!4v1775606357089!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <a href="mailto:ilovemymother@vickylive.com" class="big-cta ht">Let's Build<br>The Impossible.</a>
+    <div class="footer-links">
+        <a href="#">The Architect</a>
+        <a href="portfolio.html">Visual Archive</a>
+        <a href="vp-fashion-configurator/index.html">AI Tools</a>
+        <a href="vp.ai-virtual-photoshoot/index.html">Configurator</a>
+    </div>
+    <div class="footer-copy">© 2026 Vigneshwaran Pugazhenthi. All Rights Reserved.</div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// CURSOR
+const cursor = document.getElementById('cursor');
+const dot = document.getElementById('cursorDot');
+const colors = ['#00d4ff','#7c3aff','#ff00ff','#00f5d4'];
+let ci = 0;
+document.addEventListener('mousemove', e => {
+    gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.15 });
+    gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.05 });
+});
+document.querySelectorAll('.ht').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        ci = (ci + 1) % colors.length;
+        cursor.style.borderColor = colors[ci];
+        dot.style.background = colors[ci];
+        cursor.classList.add('hovered');
+    });
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+});
+
+// TYPEWRITER
+const words = ['AI Technologist.', '3D Innovator.', 'Digital Architect.', 'R&D Visionary.', 'Fashion Futurist.'];
+let wi = 0, ci2 = 0, deleting = false;
+const tw = document.getElementById('typewriter');
+function type() {
+    const w = words[wi];
+    if (!deleting) {
+        tw.textContent = w.slice(0, ++ci2);
+        if (ci2 === w.length) { deleting = true; setTimeout(type, 1800); return; }
+    } else {
+        tw.textContent = w.slice(0, --ci2);
+        if (ci2 === 0) { deleting = false; wi = (wi + 1) % words.length; }
+    }
+    setTimeout(type, deleting ? 60 : 100);
+}
+setTimeout(type, 800);
+tw.style.cssText = 'background:linear-gradient(135deg,#00d4ff,#7c3aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;border-right:2px solid #00d4ff;padding-right:2px;';
+
+// STATS COUNTER
+const counters = document.querySelectorAll('[data-count]');
+const countObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const target = parseFloat(el.dataset.count);
+        const suf = el.dataset.suffix || '';
+        const dec = parseInt(el.dataset.decimal || 0);
+        let cur = 0;
+        const step = target / 60;
+        const t = setInterval(() => {
+            cur = Math.min(cur + step, target);
+            el.textContent = cur.toFixed(dec) + suf;
+            if (cur >= target) clearInterval(t);
+        }, 20);
+        countObs.unobserve(el);
+    });
+}, { threshold: 0.5 });
+counters.forEach(c => countObs.observe(c));
+
+// HERO REVEAL
+gsap.timeline({ defaults: { ease: 'power3.out' } })
+    .from('#mainNav', { y: -60, opacity: 0, duration: 1 })
+    .from('.hero-eyebrow', { y: 30, opacity: 0, duration: .8 }, '-=.5')
+    .from('.hero h1', { y: 50, opacity: 0, duration: 1 }, '-=.5')
+    .from('.hero-sub', { y: 30, opacity: 0, duration: .8 }, '-=.5')
+    .from('.cta-group', { y: 30, opacity: 0, duration: .8 }, '-=.4')
+    .from('.social-sidebar', { x: 50, opacity: 0, duration: 1 }, '-=.8');
+
+gsap.from('.stat-item', { scrollTrigger: { trigger: '.stats-bar', start: 'top 85%' }, y: 40, opacity: 0, stagger: .15, duration: .8 });
+gsap.from('.about-img-wrap', { scrollTrigger: { trigger: '#about', start: 'top 80%', scrub: 1 }, scale: 1.08 });
+gsap.fromTo('.card', {y: 60, opacity: 0}, { scrollTrigger: { trigger: '#expertise', start: 'top 80%' }, y: 0, opacity: 1, stagger: .1, duration: .8, ease: 'power2.out' });
+gsap.fromTo('.t-item', {opacity: 0, x: -20}, { scrollTrigger: { trigger: '#leadership', start: 'top 75%' }, opacity: .4, x: 0, stagger: .15, duration: .7 });
+
+// CARD 3D TILT
+document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left - r.width / 2) / 20;
+        const y = (e.clientY - r.top - r.height / 2) / 20;
+        card.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg) translateY(-6px)`;
+    });
+    card.addEventListener('mouseleave', () => card.style.transform = '');
+});
+
+// MAGNETIC BUTTONS
+document.querySelectorAll('.mag-btn').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: 'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+    });
+});
+
+// SCROLL & STAGGER REVEAL
+let mm = gsap.matchMedia();
+mm.add("(min-width: 993px)", () => {
+    const panels = gsap.utils.toArray('.proj-panel');
+    const scrollTween = gsap.to(panels, {
+        xPercent: -100 * (panels.length - 1),
+        ease: 'none',
+        scrollTrigger: { trigger: '.port-wrapper', pin: true, scrub: 1, end: () => '+=' + document.querySelector('.port-container').offsetWidth }
+    });
+
+    panels.forEach(panel => {
+        const contentElems = panel.querySelectorAll('.proj-tag, .proj-h2, .proj-p, .proj-ul li');
+        gsap.from(contentElems, {
+            y: 40, opacity: 0, stagger: 0.1,
+            scrollTrigger: {
+                trigger: panel,
+                containerAnimation: scrollTween,
+                start: "left center",
+                toggleActions: "play none none reverse"
+            }
+        });
+    });
+});
+
+mm.add("(max-width: 992px)", () => {
+    const panels = gsap.utils.toArray('.proj-panel');
+    panels.forEach(panel => {
+        const contentElems = panel.querySelectorAll('.proj-tag, .proj-h2, .proj-p, .proj-ul li');
+        gsap.from(contentElems, {
+            y: 40, opacity: 0, stagger: 0.1,
+            scrollTrigger: {
+                trigger: panel,
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+            }
+        });
+    });
+});
+
+// TIMELINE ACTIVE
+document.querySelectorAll('.t-item').forEach(item => {
+    ScrollTrigger.create({ trigger: item, start: 'top 70%', onEnter: () => item.classList.add('active'), onLeaveBack: () => item.classList.remove('active') });
+});
+
+// NEURAL PARTICLE CANVAS
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const COLORS = ['#00d4ff','#7c3aff','#ff00ff','#00f5d4','#ff6b35'];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * W; this.y = Math.random() * H;
+        this.vx = (Math.random() - .5) * .4; this.vy = (Math.random() - .5) * .4;
+        this.r = Math.random() * 2 + .5;
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        this.life = Math.random();
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+}
+for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+function drawCanvas() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => p.update());
+    // draw connections
+    for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = particles[i].color;
+                ctx.globalAlpha = (1 - dist / 120) * 0.12;
+                ctx.lineWidth = .5;
+                ctx.stroke();
+            }
+        }
+    }
+    // draw dots
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.5;
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(drawCanvas);
+}
+drawCanvas();
+</script>
+</body>
+</html>
+
+
