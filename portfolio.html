@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Vigneshwaran Pugazhenthi</title>
+    <meta name="description" content="Portfolio of Vigneshwaran Pugazhenthi — AI, 3D Fashion, and Automation.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        function downloadPDF() {
+            window.print();
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg: #05050f;
+            --bg2: #0a0a1a;
+            --text: #ffffff;
+            --muted: #8888aa;
+            --c1: #00d4ff;
+            --c2: #7c3aff;
+            --c3: #ff00ff;
+            --c4: #00f5d4;
+            --c5: #ff6b35;
+            --glow1: rgba(0,212,255,0.25);
+            --glow2: rgba(124,58,255,0.25);
+            --glow3: rgba(255,0,255,0.15);
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.08);
+            
+            /* System Map Specifics */
+            --panel-bg: rgba(5, 5, 15, 0.95);
+            --line-color: rgba(255, 255, 255, 0.15);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;cursor:none;}
+        ::-webkit-scrollbar{width:6px;}
+        ::-webkit-scrollbar-track{background:#0a0a1a;}
+        ::-webkit-scrollbar-thumb{background:linear-gradient(var(--c2),var(--c1));border-radius:3px;}
+
+        /* CANVAS BG */
+        #bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+        /* AURORA ORBS */
+        .aurora{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.12;pointer-events:none;z-index:0;animation:auroraDrift 20s ease-in-out infinite alternate;}
+        .aurora-1{width:600px;height:600px;background:var(--c2);top:-100px;left:-150px;animation-delay:0s;}
+        .aurora-2{width:500px;height:500px;background:var(--c1);top:30%;right:-100px;animation-delay:-7s;}
+        .aurora-3{width:400px;height:400px;background:var(--c3);bottom:10%;left:20%;animation-delay:-14s;}
+        @keyframes auroraDrift{0%{transform:translate(0,0) scale(1);}100%{transform:translate(40px,30px) scale(1.1);}}
+
+        /* CURSOR */
+        .cursor{width:22px;height:22px;border:2px solid var(--c1);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s;mix-blend-mode:normal;}
+        .cursor-dot{width:6px;height:6px;background:var(--c1);border-radius:50%;position:fixed;pointer-events:none;z-index:100000;transform:translate(-50%,-50%);transition:background .3s;}
+        .cursor.hovered{width:50px;height:50px;border-color:var(--c3);background:rgba(255,0,255,0.08);}
+
+        /* EVERYTHING ON TOP OF CANVAS */
+        .content-layer {position:relative;z-index:10;}
+
+        /* NAV */
+        .nav{position:fixed;top:0;left:0;width:100%;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;z-index:100;background:rgba(5,5,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);}
+        .nav::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,var(--c2),var(--c1),var(--c4),var(--c3));opacity:0.5;}
+        .nav-logo{font-family:'Space Grotesk';font-weight:700;color:#fff;text-decoration:none;font-size:24px;}
+        .btn-download {background:transparent;border:1px solid rgba(0,212,255,0.4);border-radius:30px;color:var(--c1);padding:10px 22px;font-family:'Space Grotesk';text-transform:uppercase;font-size:12px;letter-spacing:1px;cursor:pointer;transition:0.3s;text-decoration:none;display:flex;align-items:center;gap:10px;background:rgba(0,212,255,0.05);}
+        .btn-download:hover {background:rgba(0,212,255,0.15);box-shadow:0 0 20px var(--glow1);}
+
+        /* PORTFOLIO HERO */
+        .hero {padding: 180px 10% 80px; text-align: center;}
+        .hero-title {font-family:'Outfit';font-size:clamp(42px,6vw,72px);font-weight:800;line-height:1.1;margin-bottom:20px;letter-spacing:-1px;}
+        .grad-text {background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 40%,var(--c3) 70%,var(--c4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:gradShift 4s ease infinite;}
+        @keyframes gradShift{0%,100%{background-position:0%;}50%{background-position:100%;}}
+        .hero-desc {color:var(--muted);font-size:18px;max-width:600px;margin:0 auto;line-height:1.7;}
+
+        /* CONTAINER FOR ALL CONTENT EXCEPT HERO */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
+
+        /* --- SPATIAL ECOSYSTEM OPERATING SYSTEM --- */
+        .system-header { text-align: center; margin-top: 50px; margin-bottom: 40px; position: relative; z-index: 5; }
+        .system-header h2 { font-size: 40px; font-weight: 800; margin-top: 8px; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+
+        .ecosystem-spatial-container {
+            position: relative;
+            width: 100%;
+            min-height: 640px;
+            margin-bottom: 90px;
+            padding: 40px 20px;
+            border-radius: 28px;
+            background: rgba(5, 5, 18, 0.4);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.6), 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* SVG CONNECTION NETWORK */
+        .ecosystem-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ecosystem-svg-layer line {
+            stroke: rgba(0, 212, 255, 0.15);
+            stroke-width: 2;
+            stroke-dasharray: 6 6;
+            transition: all 0.5s ease;
+        }
+        .ecosystem-svg-layer line.active-line {
+            stroke: var(--c1);
+            stroke-width: 2.5;
+            stroke-dasharray: 1000;
+            filter: drop-shadow(0 0 8px var(--glow1));
+            animation: linePulse 2s infinite linear;
+        }
+        @keyframes linePulse {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -20; }
+        }
+
+        /* CENTRAL SYSTEM CORE NODE */
+        .system-core-anchor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px auto;
+            position: relative;
+            z-index: 3;
+            text-align: center;
+        }
+        .core-pulse-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            background: rgba(10, 10, 28, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 40px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15), inset 0 0 15px rgba(0, 212, 255, 0.08);
+            backdrop-filter: blur(12px);
+            transition: all 0.4s ease;
+        }
+        .core-icon-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--c1);
+            box-shadow: 0 0 12px var(--glow1);
+            animation: coreBreathe 2.5s infinite ease-in-out;
+        }
+        @keyframes coreBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 10px var(--glow1); }
+            50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 22px var(--glow1), 0 0 35px var(--c1); }
+        }
+        .core-text-tag {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        .core-subtitle {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        /* SPATIAL NODES GRID */
+        .spatial-nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+            position: relative;
+            z-index: 3;
+            padding: 10px;
+        }
+
+        .spatial-node {
+            background: rgba(8, 8, 22, 0.75);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 30px 24px;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            outline: none;
+        }
+        .spatial-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--c1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .spatial-node:hover, .spatial-node:focus-visible {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 212, 255, 0.2);
+            background: rgba(12, 16, 38, 0.85);
+        }
+        .spatial-node:hover::before, .spatial-node:focus-visible::before {
+            opacity: 1;
+        }
+
+        .spatial-nodes-grid.has-active-hover .spatial-node:not(.hover-active) {
+            opacity: 0.38;
+            transform: scale(0.98);
+            filter: blur(0.5px);
+        }
+
+        .node-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .node-badge {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: var(--c1);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .node-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c2);
+            box-shadow: 0 0 8px var(--glow2);
+        }
+
+        .node-icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 16px;
+            transition: all 0.35s ease;
+        }
+        .spatial-node:hover .node-icon-box {
+            background: var(--c1);
+            color: #000;
+            border-color: var(--c1);
+            box-shadow: 0 0 25px var(--glow1);
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .node-content h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .node-content p {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13.5px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .node-cta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 14px;
+            border-top: 1px solid var(--glass-border);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--c1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .spatial-node:hover .node-cta-bar i {
+            transform: translateX(6px);
+        }
+
+        /* --- SYSTEM TAKEOVER VIEW (FULL VIEWPORT OVERLAY) --- */
+        .system-takeover-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 3, 12, 0.97);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            z-index: 99999;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.96);
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .system-takeover-view.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .takeover-top-bar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(5, 5, 18, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+        .takeover-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .takeover-back-btn:hover, .takeover-back-btn:focus-visible {
+            background: var(--c1);
+            color: #000;
+            border-color: var(--c1);
+            box-shadow: 0 0 20px var(--glow1);
+        }
+
+        .takeover-sys-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .status-pulse-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            border-radius: 20px;
+            color: var(--c1);
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .status-dot-active {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--c1);
+            box-shadow: 0 0 10px var(--glow1);
+            animation: coreBreathe 2s infinite ease-in-out;
+        }
+
+        .takeover-body {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 50px 5% 80px;
+            flex-grow: 1;
+        }
+
+        .takeover-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .takeover-category-tag {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: var(--c1);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .takeover-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 44px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+        .takeover-desc {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 17px;
+            color: var(--muted);
+            max-width: 820px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* UNCROPPED CASE STUDY STAGE & INTERACTIVE HOTSPOTS */
+        .takeover-media-stage {
+            position: relative;
+            width: 100%;
+            margin: 40px 0 60px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: #020208;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 212, 255, 0.08);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .takeover-media-stage img {
+            max-width: 100%;
+            max-height: 75vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px;
+        }
+
+        /* EVIDENCE HOTSPOTS OVERLAY */
+        .hotspot-pin {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.25);
+            border: 2px solid var(--c1);
+            box-shadow: 0 0 15px var(--glow1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        .hotspot-pin::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+        .hotspot-pin:hover {
+            transform: scale(1.3);
+            background: var(--c1);
+            box-shadow: 0 0 25px var(--glow1), 0 0 35px var(--c1);
+        }
+
+        .hotspot-tooltip {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            width: 220px;
+            background: rgba(10, 10, 28, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            backdrop-filter: blur(15px);
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 15;
+            text-align: left;
+        }
+        .hotspot-pin:hover .hotspot-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .hotspot-tag {
+            font-size: 10px;
+            color: var(--c1);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .hotspot-text {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        /* SYSTEM DETAILS GRID */
+        .takeover-sections-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .takeover-card-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 28px;
+        }
+        .takeover-box-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--c1);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .takeover-approach-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .approach-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 600;
+        }
+        .takeover-tech-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .takeover-tech-badge {
+            background: rgba(124, 58, 255, 0.1);
+            border: 1px solid rgba(124, 58, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: #fff;
+        }
+        .takeover-metrics-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        .metric-takeover-card {
+            background: rgba(0, 212, 255, 0.04);
+            border: 1px solid rgba(0, 212, 255, 0.18);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+        .metric-takeover-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--c1);
+        }
+        .metric-takeover-lbl {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* SYSTEM NAV FOOTER */
+        .takeover-footer-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .nav-system-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-system-link:hover {
+            color: var(--c1);
+        }
+
+        @media (max-width: 1024px) {
+            .spatial-nodes-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .takeover-sections-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .spatial-nodes-grid { grid-template-columns: 1fr; gap: 16px; }
+            .ecosystem-spatial-container { padding: 24px 14px; }
+            .takeover-title { font-size: 32px; }
+            .takeover-metrics-row { grid-template-columns: 1fr; }
+            .takeover-approach-list { grid-template-columns: 1fr; }
+            .ecosystem-svg-layer { display: none; }
+        }
+
+        /* --- CASE STUDIES / PROCESS & PIPELINE EXECUTION --- */
+        .section-title { font-family:'Outfit'; font-size:48px; font-weight:700; margin-bottom:15px; text-align:center; }
+        .section-sub { color:var(--muted); text-align:center; margin-bottom:60px; font-size:18px; }
+
+        .comp-container { 
+            position: relative; 
+            width: 100%; 
+            height: 600px; 
+            overflow: hidden; 
+            border-radius: 20px; 
+            border: 1px solid var(--glass-border); 
+            margin-bottom: 40px; 
+            user-select: none;
+            touch-action: none;
+            background: #05050f;
+        }
+        .comp-img { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            pointer-events: none;
+            transition: none !important;
+            transform: none !important;
+            animation: none !important;
+        }
+        .comp-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            pointer-events: none;
+            clip-path: inset(0 50% 0 0);
+        }
+        .comp-slider-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: var(--c1);
+            box-shadow: 0 0 10px var(--c1), 0 0 20px var(--glow1);
+            z-index: 8;
+            pointer-events: none;
+            transform: translateX(-50%);
+        }
+        .comp-slider-handle { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            width: 44px; 
+            height: 44px; 
+            background: var(--c1); 
+            border-radius: 50%; 
+            transform: translate(-50%, -50%); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 10; 
+            box-shadow: 0 0 20px var(--glow1); 
+            color: #000; 
+            cursor: ew-resize;
+        }
+        .label { position: absolute; top: 20px; padding: 8px 18px; background: rgba(5,5,15,0.8); border: 1px solid var(--glass-border); border-radius: 30px; font-size: 12px; text-transform: uppercase; font-weight: 700; letter-spacing:1px; backdrop-filter:blur(5px); }
+
+        .tech-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 120px; border-bottom: 1px solid var(--glass-border); padding-bottom: 60px; }
+        .tech-breakdown h3 { font-family:'Space Grotesk'; font-size:24px; margin-bottom:15px; color:#fff; }
+        .tech-breakdown p { color:var(--muted); line-height:1.7; font-size:16px; }
+        .tech-breakdown ul { list-style:none; }
+        .tech-breakdown li { color:var(--muted); padding:8px 0; border-bottom:1px solid var(--glass-border); font-size:15px; display:flex; justify-content:space-between; }
+        .tech-breakdown li strong { color:#fff; }
+
+        /* VP CONFIGURATOR ENGINE */
+        .config-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 60px; margin-bottom: 120px; position: relative; overflow: hidden; backdrop-filter: blur(12px); }
+        .config-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(90deg,var(--c3),var(--c1)); }
+        .config-card h2 { font-size: 42px; margin-bottom: 20px; font-family:'Outfit'; font-weight:800; }
+        .config-card p { color: var(--muted); font-size: 18px; line-height: 1.8; margin-bottom: 40px; max-width: 800px; }
+        .cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .cfg-col h3 { font-family:'Space Grotesk'; color:var(--c1); font-size:18px; margin-bottom:15px; text-transform:uppercase; letter-spacing:2px; }
+        .cfg-col ul { list-style:none; }
+        .cfg-col li { color: #ccc; padding: 6px 0; display:flex; align-items:center; gap:10px; font-size:15px; }
+        .cfg-col li::before { content:''; width:6px; height:6px; background:var(--c1); border-radius:50%; }
+        .btn-launch { padding:16px 36px; border-radius:50px; font-family:'Space Grotesk'; font-weight:700; font-size:14px; text-decoration:none; display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,var(--c2),var(--c1)); color:#fff; box-shadow:0 0 30px var(--glow2); transition:.4s; }
+        .btn-launch:hover { transform:translateY(-3px); box-shadow:0 0 50px var(--glow2); }
+
+        /* --- GALLERY (Masonry) --- */
+        .filter-bar { display: flex; gap: 15px; margin-bottom: 40px; justify-content: center; flex-wrap:wrap; }
+        .filter-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--muted); padding: 10px 24px; border-radius: 30px; transition: 0.3s; font-family: 'Space Grotesk'; font-size:13px; text-transform:uppercase; letter-spacing:1px; backdrop-filter:blur(5px); }
+        .filter-btn.active, .filter-btn:hover { border-color: var(--c1); color: #fff; background: rgba(0,212,255,0.1); box-shadow:0 0 20px var(--glow1); }
+
+        .gallery-masonry { column-count: 3; column-gap: 24px; padding-bottom: 100px; }
+        .gallery-item { break-inside: avoid; margin-bottom: 24px; position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.4s; }
+        .gallery-item img { width: 100%; display: block; filter: grayscale(80%); transition: 0.5s; object-fit:cover; }
+        .gallery-item:hover { border-color: var(--c3); transform: translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.5), 0 0 20px var(--glow3); z-index:2; }
+        .gallery-item:hover img { filter: grayscale(0%) scale(1.03); }
+        
+        .item-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 20px 20px; background: linear-gradient(to top, rgba(5,5,15,0.95), transparent); opacity: 0; transition: 0.4s; transform: translateY(10px); }
+        .gallery-item:hover .item-overlay { opacity: 1; transform: translateY(0); }
+        .item-title { font-family: 'Space Grotesk'; font-size: 18px; color: #fff; margin-bottom: 5px; font-weight:600; }
+        .item-cat { font-size: 11px; color: var(--c1); text-transform: uppercase; font-family:'Space Grotesk'; letter-spacing:2px; }
+
+        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,15,0.95); backdrop-filter:blur(15px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; user-select:none; }
+        .lightbox-content-wrapper { position: relative; max-width: 85vw; max-height: 85vh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; }
+        .lightbox img, .lightbox video { max-width: 80vw; max-height: 75vh; border-radius: 12px; box-shadow: 0 0 60px rgba(0,0,0,0.6); border: 1px solid var(--glass-border); object-fit: contain; }
+        .close-lightbox { position: absolute; top: 30px; right: 40px; color: #fff; font-size: 24px; transition:0.3s; width:50px; height:50px; background:var(--glass); border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--glass-border); z-index: 10002; cursor: pointer; }
+        .close-lightbox:hover { background:var(--c3); border-color:var(--c3); transform:rotate(90deg); box-shadow:0 0 20px var(--glow3); }
+        
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 54px; height: 54px; border-radius: 50%; background: rgba(10,10,26,0.7); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); z-index: 10002; outline: none; }
+        .lightbox-prev { left: 40px; }
+        .lightbox-next { right: 40px; }
+        .lightbox-nav:hover { background: rgba(0, 212, 255, 0.2); border-color: var(--c1); color: var(--c1); box-shadow: 0 0 25px var(--glow1); transform: translateY(-50%) scale(1.1); }
+        .lightbox-nav:active { transform: translateY(-50%) scale(0.95); }
+
+        .lightbox-caption { margin-top: 15px; text-align: center; font-family: 'Space Grotesk', sans-serif; pointer-events: none; }
+        .lightbox-title { font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
+        .lightbox-cat { font-size: 12px; color: var(--c1); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+
+        @media (max-width: 768px) {
+            .lightbox-prev { left: 15px; width: 44px; height: 44px; font-size: 16px; }
+            .lightbox-next { right: 15px; width: 44px; height: 44px; font-size: 16px; }
+            .close-lightbox { top: 20px; right: 20px; width: 40px; height: 40px; font-size: 20px; }
+            .lightbox img, .lightbox video { max-width: 90vw; max-height: 70vh; }
+        }
+
+        /* FOOTER */
+        .footer{padding:80px 5% 40px;background:rgba(5,5,15,0.95);border-top:1px solid var(--glass-border);text-align:center;}
+        .footer-links{display:flex;justify-content:center;gap:40px;margin-bottom:30px;font-family:'Space Grotesk';}
+        .footer-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:.3s;text-transform:uppercase;letter-spacing:1px;}
+        .footer-links a:hover{color:var(--c1);}
+        .footer-copy{color:#3a3a5a;font-size:12px;font-family:'Space Grotesk';}
+
+        @media (max-width: 1024px) {
+            .map-content-panel { width: 60%; }
+            .gallery-masonry { column-count: 2; }
+            .tech-breakdown, .cfg-grid { grid-template-columns: 1fr; gap: 20px;}
+        }
+        @media (max-width: 768px) {
+            .map-content-panel { width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%); border-left:none; border-top:1px solid var(--glass-border); }
+            .panel-scroll { padding: 40px 30px; }
+            .gallery-masonry { column-count: 1; }
+            .hero-title { font-size: 42px; }
+            .nav-btn span { display:none; }
+            .arch-grid { padding: 0; }
+            .comp-overlay { width: 100%; border-right: none; border-bottom: 2px solid var(--c1); height: 50%; }
+            .comp-slider-handle { top: 50%; left: 50%; }
+        }
+
+        /* --- PRINT / PDF EXPORT SYTLING --- */
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .nav, .hero, .footer, .map-content-panel, .comp-container, .tech-breakdown, .config-card, .filter-bar, .gallery-masonry { display: none !important; }
+            .arch-grid { display: grid; grid-template-columns: repeat(3, 1fr) !important; gap: 20px !important; padding: 0 !important; }
+            .arch-card { background: none !important; border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; }
+            .arch-icon { border: 1px solid #999 !important; color: #000 !important; background: transparent !important; }
+            .arch-info h4 { color: #000 !important; }
+            .arch-info p { color: #333 !important; }
+            .system-header h2 { color: #000 !important; }
+            #system-map-section { margin-bottom: 0 !important; }
+        }
+    </style>
+</head>
+<body id="content-to-print">
+
+    <!-- CANVAS BACKGROUND -->
+    <canvas id="bgCanvas"></canvas>
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <div class="content-layer">
+
+        <!-- NAV -->
+        <nav class="nav">
+            <a href="index.html" class="nav-logo ht"><img src="assets/images/global/LogoVickyLive.png" alt="VickyLive Logo" style="height: 32px; display: block;"></a>
+            <div style="display:flex; gap:20px;">
+                <a href="index.html" class="btn-download ht" style="border:none; background:transparent;">Home</a>
+                <button onclick="downloadPDF()" class="btn-download ht">
+                    <i class="fas fa-file-download"></i> <span>Export PDF</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero">
+            <h1 class="hero-title">The <span class="grad-text">Visual Archive.</span></h1>
+            <p class="hero-desc">Explore the systems, processes, and high-fidelity artifacts born from the intersection of AI, automated workflows, and 3D fashion execution.</p>
+        </section>
+
+        <div class="container">
+            
+            <!-- SYSTEM MAP & SPATIAL OPERATING SYSTEM -->
+            <div class="system-header">
+                <div style="font-family:'Space Grotesk'; font-size:12px; color:var(--c1); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px;">01 / Ecosystem</div>
+                <h2>System Architecture Map</h2>
+                <p style="color:var(--muted); font-size: 15px; margin-top:10px;">Interactive professional operating system. Select any node to launch System Takeover.</p>
+            </div>
+
+            <div id="system-map-section">
+                <div class="ecosystem-spatial-container">
+                    
+                    <!-- SVG CONNECTION NETWORK LAYER -->
+                    <svg class="ecosystem-svg-layer" id="ecosystemSvg">
+                        <line x1="16%" y1="20%" x2="50%" y2="20%" id="line1" />
+                        <line x1="50%" y1="20%" x2="84%" y2="20%" id="line2" />
+                        <line x1="50%" y1="20%" x2="50%" y2="50%" id="lineCenter" />
+                        <line x1="16%" y1="50%" x2="50%" y2="50%" id="line3" />
+                        <line x1="50%" y1="50%" x2="84%" y2="50%" id="line4" />
+                        <line x1="16%" y1="80%" x2="50%" y2="50%" id="line5" />
+                        <line x1="50%" y1="80%" x2="50%" y2="50%" id="line6" />
+                        <line x1="84%" y1="80%" x2="50%" y2="50%" id="line7" />
+                    </svg>
+
+                    <!-- CENTRAL SYSTEM CORE ANCHOR -->
+                    <div class="system-core-anchor">
+                        <div class="core-pulse-badge">
+                            <span class="core-icon-dot"></span>
+                            <span class="core-text-tag">SYSTEM CORE</span>
+                        </div>
+                        <div class="core-subtitle">DESIGN × TECHNOLOGY × SYSTEMS</div>
+                    </div>
+
+                    <!-- SPATIAL NODES GRID -->
+                    <div class="spatial-nodes-grid" id="spatialNodesGrid">
+                        
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO001" onclick="enterSystem('PO001')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO001');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 01</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-fingerprint"></i></div>
+                            <div class="node-content">
+                                <h3>The Architect</h3>
+                                <p>Intersection of Tech & Fashion Systems</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO002" onclick="enterSystem('PO002')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO002');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 02</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-flask"></i></div>
+                            <div class="node-content">
+                                <h3>R&D</h3>
+                                <p>Exploration & Next-Gen Innovations</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO003" onclick="enterSystem('PO003')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO003');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 03</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-file-contract"></i></div>
+                            <div class="node-content">
+                                <h3>Documentation</h3>
+                                <p>Infrastructure & Technical Guides</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO004" onclick="enterSystem('PO004')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO004');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 04</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-camera"></i></div>
+                            <div class="node-content">
+                                <h3>Virtual Studio</h3>
+                                <p>High-fidelity Photorealistic Rendering</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO005" onclick="enterSystem('PO005')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO005');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 05</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-cogs"></i></div>
+                            <div class="node-content">
+                                <h3>Automation</h3>
+                                <p>Robotic Process Logic & Automation</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO006" onclick="enterSystem('PO006')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO006');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 06</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-code"></i></div>
+                            <div class="node-content">
+                                <h3>Tools & AI</h3>
+                                <p>Generative Technical Frameworks</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO007" onclick="enterSystem('PO007')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO007');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 07</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-shield-alt"></i></div>
+                            <div class="node-content">
+                                <h3>Testing & QC</h3>
+                                <p>Validation Standards & Integrity</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO008" onclick="enterSystem('PO008')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO008');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 08</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-bullseye"></i></div>
+                            <div class="node-content">
+                                <h3>Impact</h3>
+                                <p>Measurable Proofs of Concept</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="spatial-node ht" tabindex="0" role="button" data-id="PO009" onclick="enterSystem('PO009')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();enterSystem('PO009');}">
+                            <div class="node-top-bar">
+                                <span class="node-badge">NODE // 09</span>
+                                <span class="node-status-dot"></span>
+                            </div>
+                            <div class="node-icon-box"><i class="fas fa-users"></i></div>
+                            <div class="node-content">
+                                <h3>Leadership</h3>
+                                <p>Team Enablement & Mentorship</p>
+                            </div>
+                            <div class="node-cta-bar">
+                                <span>ENTER SYSTEM</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM TAKEOVER VIEW OVERLAY (FULL VIEWPORT) -->
+            <div id="systemTakeoverView" class="system-takeover-view" role="dialog" aria-modal="true" aria-hidden="true">
+                <div class="takeover-top-bar">
+                    <button class="takeover-back-btn ht" onclick="exitSystem()" aria-label="Return to Ecosystem">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>RETURN TO ECOSYSTEM</span>
+                    </button>
+                    <div class="takeover-sys-status">
+                        <span id="takeoverNodeTag">PO001</span>
+                        <div class="status-pulse-pill">
+                            <span class="status-dot-active"></span>
+                            <span>SYSTEM ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="takeover-body" id="takeoverBodyContent">
+                    <!-- Dynamic Takeover Content Injected by JS -->
+                </div>
+            </div>
+
+            <!-- PROCESS / SLIDER -->
+            <div style="font-family:'Space Grotesk'; font-size:12px; color:var(--c2); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; text-align:center;">02 / Pipeline Execution</div>
+            <h2 class="section-title">Process & <span class="grad-text">Production</span></h2>
+            <p class="section-sub">A breakdown of how digital assets travel from wireframe topology to final rendered composite.</p>
+
+            <div class="comp-container" id="slider1">
+                <img src="assets/images/portfolio/pipeline_execution/after.png" class="comp-img comp-img-after" alt="Final 3D Render" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop'">
+                <span class="label" style="right: 20px; z-index: 5;">Final 3D Render</span>
+                
+                <div class="comp-overlay" id="compOverlay">
+                    <img src="assets/images/portfolio/pipeline_execution/before.png" class="comp-img comp-img-before" alt="Mesh Topology" onerror="this.src='https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop'">
+                </div>
+                <span class="label" style="left: 20px; z-index: 5;">Mesh Topology</span>
+                <div class="comp-slider-line" id="sliderLine"></div>
+                <div class="comp-slider-handle ht" id="sliderHandle"><i class="fas fa-arrows-alt-h"></i></div>
+            </div>
+
+            <div class="tech-breakdown">
+                <div>
+                    <h3>Technical Pipeline Strategy</h3>
+                    <p>Using custom Python scripts to automate texture baking and UV unwrapping, we reduced the per-asset render time by 40%. The dense simulation mesh from CLO3D was retopologized and optimized in Blender before export to Avataar's real-time engine to ensure maximum frame rates on mobile web AR.</p>
+                </div>
+                <div>
+                    <ul>
+                        <li><span><strong>Core Tools</strong></span> <span style="color:var(--c1)">CLO3D, Blender, Python Scripts</span></li>
+                        <li><span><strong>Rendering</strong></span> <span style="color:var(--c2)">Cycles / Eevee Engine</span></li>
+                        <li><span><strong>Poly Output</strong></span> <span style="color:var(--c3)">2M Polys &rarr; Highly Optimized 50k</span></li>
+                        <li><span><strong>Automation</strong></span> <span style="color:var(--c4)">70% manual stage reduction</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CONFIG ENGINE -->
+            <div class="config-card">
+                <div style="font-family:'Space Grotesk'; font-size:12px; color:var(--c3); letter-spacing:3px; text-transform:uppercase; margin-bottom:15px;">03 / System Build</div>
+                <h2>VP <span class="grad-text">Configurator Engine</span></h2>
+                <p>A production-level real-time 3D garment engine designed for modular mix & match styling. Built using Three.js with Draco-compressed GLB assets, custom HDR-based lighting, and a scalable folder architecture. The engine demonstrates systemic thinking, complex garment layering logic, and independent material control within a high-performance browser-based environment.</p>
+
+                <div class="cfg-grid">
+                    <div class="cfg-col">
+                        <h3>Engine Capabilities</h3>
+                        <ul>
+                            <li>Real-time WebGL rendering pipeline</li>
+                            <li>Draco-optimized GLB asset loading</li>
+                            <li>Dynamic Men / Women mannequin switching</li>
+                            <li>Mix & Match rules (Top / Bottom / Jacket conflicts)</li>
+                        </ul>
+                    </div>
+                    <div class="cfg-col">
+                        <h3>Architecture Logic</h3>
+                        <ul>
+                            <li>Modular ES6 Component Structure</li>
+                            <li>Environment State Manager</li>
+                            <li>Garment Dependency Controller</li>
+                            <li>Dynamic Color / Material Injection</li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="vp-fashion-configurator/index.html" class="btn-launch ht"><i class="fas fa-rocket"></i> Launch Interactive Experience</a>
+            </div>
+
+            <!-- GALLERY -->
+            <div style="font-family:'Space Grotesk'; font-size:12px; color:var(--c4); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; text-align:center;">04 / Archive Repository</div>
+            <h2 class="section-title">The <span class="grad-text">Visual Gallery</span></h2>
+            
+            <div class="filter-bar">
+                <button class="filter-btn active ht" onclick="filterGallery('all')">All Work</button>
+                <button class="filter-btn ht" onclick="filterGallery('digital_fashion')">Digital Fashion</button>
+                <button class="filter-btn ht" onclick="filterGallery('digital_fashion_videos')">Digital Fashion Videos</button>
+                <button class="filter-btn ht" onclick="filterGallery('ai_automation')">AI Automation</button>
+                <button class="filter-btn ht" onclick="filterGallery('commercial')">Commercial</button>
+            </div>
+
+            <div class="gallery-masonry">
+                <!-- Digital Fashion Images -->
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i001.png" alt="Digital Fashion 01" onerror="this.src='https://images.unsplash.com/photo-1558769132-cb1fac0840c2?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Cyber Virtual Collection 01</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i002.png" alt="Digital Fashion 02" onerror="this.src='https://images.unsplash.com/photo-1583391733958-d69805d233a0?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Fabric Simulation 02</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i003.png" alt="Digital Fashion 03" onerror="this.src='https://images.unsplash.com/photo-1627443152661-f9260d7ca022?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Avant-Garde Structure 03</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i004.png" alt="Digital Fashion 04" onerror="this.src='https://images.unsplash.com/photo-1558769132-cb1fac0840c2?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">High-Fashion Draping 04</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i005.png" alt="Digital Fashion 05" onerror="this.src='https://images.unsplash.com/photo-1583391733958-d69805d233a0?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Pattern Engineering 05</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i006.png" alt="Digital Fashion 06" onerror="this.src='https://images.unsplash.com/photo-1627443152661-f9260d7ca022?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Virtual Tailoring 06</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i007.png" alt="Digital Fashion 07" onerror="this.src='https://images.unsplash.com/photo-1558769132-cb1fac0840c2?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Digital Couture 07</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+                <div class="gallery-item digital_fashion fashion ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/digital_fashion/vgdf_i008.png" alt="Digital Fashion 08" onerror="this.src='https://images.unsplash.com/photo-1583391733958-d69805d233a0?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Virtual Lookbook 08</div><div class="item-cat">Digital Fashion</div></div>
+                </div>
+
+                <!-- Digital Fashion Videos -->
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v001.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Combo Motion 01</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v002.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Delilah Stage Walk 02</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v003.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Delilah Stage Walk 03</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v004.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Apparel Showcase 04</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v005.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 05</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v006.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 06</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v007.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 07</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v008.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 08</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v009.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 09</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v010.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 10</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v011.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 11</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v012.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 12</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v013.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 13</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v014.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 14</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v015.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 15</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v016.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 16</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v017.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 17</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v018.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 18</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v019.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 19</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v020.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 20</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v021.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 21</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v022.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 22</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v023.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 23</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v024.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 24</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v025.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 25</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v026.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Look Motion 26</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v027.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Male Runway Look 27</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+                <div class="gallery-item digital_fashion_videos ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/digital_fashion_videos/vgdfv_v028.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Male Runway Look 28</div><div class="item-cat">Digital Fashion Videos</div></div>
+                </div>
+
+                <!-- Commercial -->
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <video src="assets/images/portfolio/gallery/commercial/vgc_v001.mp4" autoplay loop muted playsinline style="width:100%; display:block; object-fit:cover;"></video>
+                    <div class="item-overlay"><div class="item-title">Commercial Brand Motion 01</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i001.png" alt="Commercial Render 01" onerror="this.src='https://images.unsplash.com/photo-1574365360816-5b58beddcece?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 01</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i002.png" alt="Commercial Render 02" onerror="this.src='https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 02</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i003.png" alt="Commercial Render 03" onerror="this.src='https://images.unsplash.com/photo-1574365360816-5b58beddcece?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 03</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i004.png" alt="Commercial Render 04" onerror="this.src='https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 04</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i005.png" alt="Commercial Render 05" onerror="this.src='https://images.unsplash.com/photo-1574365360816-5b58beddcece?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 05</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i006.png" alt="Commercial Render 06" onerror="this.src='https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 06</div><div class="item-cat">Commercial</div></div>
+                </div>
+                <div class="gallery-item commercial ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/commercial/vgc_i007.png" alt="Commercial Render 07" onerror="this.src='https://images.unsplash.com/photo-1574365360816-5b58beddcece?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Commercial Render 07</div><div class="item-cat">Commercial</div></div>
+                </div>
+
+                <!-- AI Automation -->
+                <div class="gallery-item ai_automation ai ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/ai_automation/auto_i001.png" alt="AI Texture Gen" onerror="this.src='https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Neural Texture Generation</div><div class="item-cat">AI Automation</div></div>
+                </div>
+                <div class="gallery-item ai_automation ai ht" onclick="openLightbox(this)">
+                    <img src="assets/images/portfolio/gallery/ai_automation/auto_i002.png" alt="AI Patterning" onerror="this.src='https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600'">
+                    <div class="item-overlay"><div class="item-title">Generative AI Patterning</div><div class="item-cat">AI Automation</div></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-links">
+                <a class="ht" href="index.html">The Architect</a>
+                <a class="ht" href="vp-fashion-configurator/index.html">AI Tools</a>
+                <a class="ht" href="vp.ai-virtual-photoshoot/index.html">Engine Demo</a>
+            </div>
+            <div class="footer-copy">© 2026 Vigneshwaran Pugazhenthi. All Systems Operational.</div>
+        </footer>
+
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
+        <span class="close-lightbox ht" onclick="closeLightbox()" title="Close (Esc)"><i class="fas fa-times"></i></span>
+        <button class="lightbox-nav lightbox-prev ht" id="lightbox-prev" onclick="navigateLightbox(-1, event)" aria-label="Previous Media" title="Previous (Left Arrow)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-nav lightbox-next ht" id="lightbox-next" onclick="navigateLightbox(1, event)" aria-label="Next Media" title="Next (Right Arrow)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <div class="lightbox-content-wrapper">
+            <img id="lightbox-img" src="" alt="Gallery Preview" style="display:none;">
+            <video id="lightbox-vid" src="" controls autoplay loop playsinline style="display:none;"></video>
+            <div class="lightbox-caption" id="lightbox-caption">
+                <div class="lightbox-title" id="lightbox-title"></div>
+                <div class="lightbox-cat" id="lightbox-cat"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PDF EXPORT
+        function downloadPDF() {
+            const element = document.getElementById('content-to-print');
+            const opt = {
+                margin: 0,
+                filename: 'VP_Architecture_Portfolio.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // CURSOR
+        const cursor = document.getElementById('cursor');
+        const dot = document.getElementById('cursorDot');
+        const colors = ['#00d4ff','#7c3aff','#ff00ff','#00f5d4'];
+        let ci = 0;
+        document.addEventListener('mousemove', e => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.15 });
+            gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.05 });
+        });
+        function bindHoverEffect(el) {
+            if (el.dataset.hoverBound) return;
+            el.dataset.hoverBound = 'true';
+            el.addEventListener('mouseenter', () => {
+                ci = (ci + 1) % colors.length;
+                cursor.style.borderColor = colors[ci];
+                dot.style.background = colors[ci];
+                cursor.classList.add('hovered');
+            });
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        }
+        document.querySelectorAll('.ht').forEach(bindHoverEffect);
+        document.addEventListener('mouseover', (e) => {
+            const htTarget = e.target.closest('.ht');
+            if (htTarget) {
+                bindHoverEffect(htTarget);
+            }
+        });
+
+        // CANVAS BACKGROUND (Neural Particles)
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, particles = [];
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * W; this.y = Math.random() * H;
+                this.vx = (Math.random() - .5) * .4; this.vy = (Math.random() - .5) * .4;
+                this.r = Math.random() * 2 + .5;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+            }
+        }
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+        function drawCanvas() {
+            ctx.clearRect(0, 0, W, H);
+            particles.forEach(p => p.update());
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = particles[i].color;
+                        ctx.globalAlpha = (1 - dist / 120) * 0.12;
+                        ctx.lineWidth = .5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            particles.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color; ctx.globalAlpha = 0.5; ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(drawCanvas);
+        }
+        drawCanvas();
+
+        // PIPELINE EXECUTION SLIDER (Static 1:1 Scale Clip-Path Slider)
+        const sliderCont = document.getElementById('slider1');
+        const compOverlay = document.getElementById('compOverlay');
+        const sliderLine = document.getElementById('sliderLine');
+        const sliderHandle = document.getElementById('sliderHandle');
+
+        let isDraggingSlider = false;
+
+        function updateSliderPosition(clientX) {
+            if (!sliderCont || !compOverlay || !sliderHandle || !sliderLine) return;
+            const rect = sliderCont.getBoundingClientRect();
+            let x = clientX - rect.left;
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+            
+            const pct = (x / rect.width) * 100;
+            
+            compOverlay.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+            sliderLine.style.left = `${pct}%`;
+            sliderHandle.style.left = `${pct}%`;
+        }
+
+        if (sliderCont) {
+            sliderCont.addEventListener('mousemove', (e) => {
+                updateSliderPosition(e.clientX);
+            });
+
+            sliderCont.addEventListener('mousedown', (e) => {
+                isDraggingSlider = true;
+                updateSliderPosition(e.clientX);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDraggingSlider) updateSliderPosition(e.clientX);
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDraggingSlider = false;
+            });
+
+            // Mobile Touch Events
+            sliderCont.addEventListener('touchstart', (e) => {
+                isDraggingSlider = true;
+                if (e.touches && e.touches.length > 0) updateSliderPosition(e.touches[0].clientX);
+            }, { passive: true });
+
+            sliderCont.addEventListener('touchmove', (e) => {
+                if (isDraggingSlider && e.touches && e.touches.length > 0) updateSliderPosition(e.touches[0].clientX);
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                isDraggingSlider = false;
+            });
+        }
+
+        // GALLERY FILTER
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                    gsap.to(item, {opacity: 1, scale: 1, duration: 0.3});
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // LIGHTBOX & GALLERY NAVIGATION
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxVid = document.getElementById('lightbox-vid');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxCat = document.getElementById('lightbox-cat');
+
+        let activeGalleryItems = [];
+        let currentMediaIndex = -1;
+
+        function openSingleImageLightbox(src, caption) {
+            if (!lightbox || !lightboxImg || !lightboxVid) return;
+            lightboxVid.pause();
+            lightboxVid.style.display = 'none';
+            lightboxVid.src = '';
+            
+            lightboxImg.src = src;
+            lightboxImg.alt = caption;
+            lightboxImg.style.display = 'block';
+            
+            if (lightboxTitle) lightboxTitle.textContent = caption;
+            if (lightboxCat) lightboxCat.textContent = 'Ecosystem Visual';
+            
+            activeGalleryItems = [];
+            currentMediaIndex = -1;
+            
+            lightbox.style.display = 'flex';
+            gsap.to(lightbox, {opacity: 1, duration: 0.3});
+        }
+
+        function getVisibleGalleryItems() {
+            const allItems = Array.from(document.querySelectorAll('.gallery-item'));
+            const visibleItems = allItems.filter(item => {
+                const style = window.getComputedStyle(item);
+                return style.display !== 'none';
+            });
+            return visibleItems.length > 0 ? visibleItems : allItems;
+        }
+
+        function openLightbox(element) {
+            activeGalleryItems = getVisibleGalleryItems();
+            currentMediaIndex = activeGalleryItems.indexOf(element);
+            if (currentMediaIndex === -1) {
+                currentMediaIndex = 0;
+            }
+            renderLightboxMedia(currentMediaIndex);
+
+            if (lightbox.style.display !== 'flex') {
+                lightbox.style.display = 'flex';
+                gsap.to(lightbox, {opacity: 1, duration: 0.3});
+            }
+        }
+
+        function renderLightboxMedia(index) {
+            if (!activeGalleryItems || activeGalleryItems.length === 0) return;
+            
+            // Wrap around navigation
+            currentMediaIndex = (index + activeGalleryItems.length) % activeGalleryItems.length;
+            const currentItem = activeGalleryItems[currentMediaIndex];
+
+            const img = currentItem.querySelector('img');
+            const vid = currentItem.querySelector('video');
+            const titleEl = currentItem.querySelector('.item-title');
+            const catEl = currentItem.querySelector('.item-cat');
+
+            const title = titleEl ? titleEl.textContent : '';
+            const cat = catEl ? catEl.textContent : '';
+
+            if (lightboxTitle) lightboxTitle.textContent = title;
+            if (lightboxCat) lightboxCat.textContent = cat;
+
+            if (img && img.src) {
+                lightboxVid.pause();
+                lightboxVid.style.display = 'none';
+                lightboxVid.src = '';
+                lightboxImg.src = img.src;
+                lightboxImg.alt = img.alt || title;
+                lightboxImg.style.display = 'block';
+            } else if (vid && vid.src) {
+                lightboxImg.style.display = 'none';
+                lightboxImg.src = '';
+                lightboxVid.src = vid.src;
+                lightboxVid.style.display = 'block';
+                lightboxVid.currentTime = 0;
+                lightboxVid.play().catch(err => console.log('Autoplay prevented:', err));
+            }
+        }
+
+        function navigateLightbox(direction, event) {
+            if (event) event.stopPropagation();
+            renderLightboxMedia(currentMediaIndex + direction);
+        }
+
+        function closeLightbox() {
+            gsap.to(lightbox, {opacity: 0, duration: 0.3, onComplete: () => {
+                lightbox.style.display = 'none';
+                lightboxImg.src = '';
+                lightboxVid.pause();
+                lightboxVid.src = '';
+                if (cursor) cursor.classList.remove('hovered');
+            }});
+        }
+
+        function handleLightboxClick(event) {
+            if (event.target === lightbox) {
+                closeLightbox();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (takeoverView && takeoverView.classList.contains('active')) {
+                    e.preventDefault();
+                    exitSystem();
+                    return;
+                }
+                if (lightbox && (lightbox.style.display === 'flex' || window.getComputedStyle(lightbox).display === 'flex')) {
+                    e.preventDefault();
+                    closeLightbox();
+                    return;
+                }
+            }
+            if (lightbox && (lightbox.style.display === 'flex' || window.getComputedStyle(lightbox).display === 'flex')) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    navigateLightbox(-1);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    navigateLightbox(1);
+                }
+            }
+        });
+
+        // SPATIAL NODE HOVER NETWORK EFFECT
+        const spatialGrid = document.getElementById('spatialNodesGrid');
+        const spatialNodes = document.querySelectorAll('.spatial-node');
+        const svgLines = document.querySelectorAll('.ecosystem-svg-layer line');
+
+        if (spatialNodes) {
+            spatialNodes.forEach(node => {
+                node.addEventListener('mouseenter', () => {
+                    if (spatialGrid) spatialGrid.classList.add('has-active-hover');
+                    node.classList.add('hover-active');
+                    if (svgLines) {
+                        svgLines.forEach(l => l.classList.add('active-line'));
+                    }
+                });
+                node.addEventListener('mouseleave', () => {
+                    if (spatialGrid) spatialGrid.classList.remove('has-active-hover');
+                    node.classList.remove('hover-active');
+                    if (svgLines) {
+                        svgLines.forEach(l => l.classList.remove('active-line'));
+                    }
+                });
+            });
+        }
+
+        // SYSTEM MAP ENGINE & SYSTEM TAKEOVER ENGINE
+        const nodeData = {
+            'PO001': {
+                category: "→ ARCHITECT",
+                title: "Intersection of Tech & Fashion",
+                fileName: "portfolio/ecosystem/Architect.png",
+                description: "Over the last three years at Avataar.Ai, my role evolved beyond execution into ownership—of processes, documentation, research, and automation. My strength lies in understanding complex systems deeply, documenting them clearly, and driving continuous operational evolution.",
+                approach: ["01 — Research", "02 — Define", "03 — Develop", "04 — Validate"],
+                tools: ["CLO3D", "Blender", "Python Automation", "WebGL / Three.js", "GSAP"],
+                impact: [{ label: "Throughput", val: "3.5x" }, { label: "SOPs Built", val: "24+" }, { label: "Uptime", val: "99.9%" }]
+            },
+            'PO002': {
+                category: "→ R&D",
+                title: "Exploration & Innovation",
+                fileName: "portfolio/ecosystem/R&D.png",
+                description: "Continuous research into CLO3D simulation pipelines, virtual try-on mechanics, and visual accuracy (Pantone matching & real-time lighting shaders) forms the backbone of my technical R&D contributions.",
+                approach: ["01 — Research", "02 — Prototype", "03 — Benchmark", "04 — Deploy"],
+                tools: ["Neural Textures", "Real-Time Physics", "Blender Cycles", "Color Calibration"],
+                impact: [{ label: "Render Latency", val: "-60%" }, { label: "Experiments", val: "45+" }, { label: "Fidelity", val: "4K Native" }]
+            },
+            'PO003': {
+                category: "→ KNOWLEDGE",
+                title: "Infrastructure & Guides",
+                fileName: "portfolio/ecosystem/Knowledge.png",
+                description: "Designed and authored comprehensive technical documentation for every major pipeline workflow. Authoring SOPs, QC matrices, API references, and partner onboarding handbooks ensures team scaling.",
+                approach: ["01 — Audit", "02 — Structure", "03 — Author", "04 — Maintain"],
+                tools: ["SOP Frameworks", "Markdown Specs", "QC Matrices", "API Docs"],
+                impact: [{ label: "Onboarding", val: "-70%" }, { label: "Doc Pages", val: "120+" }, { label: "Error Rate", val: "-85%" }]
+            },
+            'PO004': {
+                category: "→ REALISM",
+                title: "Virtual Photoshoot Automation",
+                fileName: "portfolio/ecosystem/Realism.png",
+                description: "Developed layer-based automated compositing frameworks to achieve photographic realism at scale. Combines 3D garment renders with dynamic studio lighting and background environments.",
+                approach: ["01 — Stage Set", "02 — Lighting Map", "03 — Render Batch", "04 — Composite"],
+                tools: ["Blender Cycles", "Octane Render", "Python Compositor", "HDR Envs"],
+                impact: [{ label: "Cost/Shoot", val: "-90%" }, { label: "Assets Done", val: "5,000+" }, { label: "Studio Speed", val: "10x" }]
+            },
+            'PO005': {
+                category: "→ LOGIC",
+                title: "Robotic Process Automation",
+                fileName: "portfolio/ecosystem/Logic.png",
+                description: "Independently built, tested, and deployed multiple RPA background workers to eliminate repetitive manual asset prep, UV unwrapping, file conversion, and metadata tagging.",
+                approach: ["01 — Trace Flow", "02 — Script Bot", "03 — Stress Test", "04 — Auto-Run"],
+                tools: ["Python Scripts", "PyAutoGUI", "CLI Utilities", "Node.js"],
+                impact: [{ label: "Steps Saved", val: "80%" }, { label: "Files Handled", val: "10,000+" }, { label: "Auto Rate", val: "95%" }]
+            },
+            'PO006': {
+                category: "→ SCRIPTING",
+                title: "Technical Frameworks & AI",
+                fileName: "portfolio/ecosystem/Scripting.png",
+                description: "Custom AI toolchains integrating Stable Diffusion, ControlNet, and procedural Blender scripts for instant pattern synthesis and high-speed material generation.",
+                approach: ["01 — Data Prep", "02 — Model Train", "03 — UI Plugin", "04 — Integration"],
+                tools: ["PyTorch", "Stable Diffusion", "ControlNet", "Blender API"],
+                impact: [{ label: "Gen Speed", val: "< 5s" }, { label: "Models Trained", val: "12" }, { label: "Efficiency", val: "+300%" }]
+            },
+            'PO007': {
+                category: "→ VALIDATION",
+                title: "Testing & Quality Control",
+                fileName: "portfolio/ecosystem/Validation.png",
+                description: "Quality control architectures and structured validation matrices for testing RPAs, AI output, mesh topology density, and WebGL performance integrity.",
+                approach: ["01 — Spec Review", "02 — Mesh Check", "03 — Visual QA", "04 — Sign-Off"],
+                tools: ["Topology Inspector", "Normal Auditors", "WebGL Profiler", "ISO Specs"],
+                impact: [{ label: "QA Accuracy", val: "99.8%" }, { label: "Auto Checks", val: "32/file" }, { label: "Defects", val: "0%" }]
+            },
+            'PO008': {
+                category: "→ DELIVERY",
+                title: "Proofs of Concept",
+                fileName: "portfolio/ecosystem/Delivery.png",
+                description: "Delivered complex Proofs of Concept for high-tier retail and luxury fashion brands, blending emerging tools with stable execution to lock major client partnerships.",
+                approach: ["01 — Brief Analysis", "02 — Prototype", "03 — Client Demo", "04 — Production"],
+                tools: ["Three.js", "CLO3D Garments", "Interactive Web3D", "Client Decks"],
+                impact: [{ label: "Deal Win Rate", val: "92%" }, { label: "Client PoCs", val: "18+" }, { label: "Contracts", val: "Multi-Year" }]
+            },
+            'PO009': {
+                category: "→ ENABLEMENT",
+                title: "Team Enablement & Leadership",
+                fileName: "portfolio/ecosystem/Enablement.png",
+                description: "Invested heavily in enabling cross-functional teams of 3D artists, engineers, and QA specialists through structured workshops, mentorship, and clear performance OKRs.",
+                approach: ["01 — Assess Skills", "02 — Workshop", "03 — Hands-On Lab", "04 — OKR Track"],
+                tools: ["Technical Seminars", "Mentorship Modules", "OKR Frameworks", "Team SOPs"],
+                impact: [{ label: "Team Scale", val: "3x" }, { label: "Workshops", val: "30+" }, { label: "Satisfaction", val: "98%" }]
+            }
+        };
+
+        const takeoverView = document.getElementById('systemTakeoverView');
+        const takeoverBody = document.getElementById('takeoverBodyContent');
+        const takeoverTag = document.getElementById('takeoverNodeTag');
+        const nodeKeys = Object.keys(nodeData);
+
+        function enterSystem(id) {
+            const data = nodeData[id];
+            if (!data) return;
+
+            const currentIndex = nodeKeys.indexOf(id);
+            const prevId = nodeKeys[(currentIndex - 1 + nodeKeys.length) % nodeKeys.length];
+            const nextId = nodeKeys[(currentIndex + 1) % nodeKeys.length];
+
+            takeoverTag.textContent = `${data.category} // ${id}`;
+
+            let html = `
+                <div class="takeover-header">
+                    <div class="takeover-category-tag">${data.category}</div>
+                    <h2 class="takeover-title">${data.title}</h2>
+                    <p class="takeover-desc">${data.description}</p>
+                </div>
+
+                <!-- UNCROPPED ARTWORK STAGE WITH EVIDENCE HOTSPOTS -->
+                <div class="takeover-media-stage">
+                    <img src="assets/images/${data.fileName}" alt="${data.title}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200'">
+                    
+                    <div class="hotspot-pin" style="top: 25%; left: 30%;">
+                        <div class="hotspot-tooltip">
+                            <div class="hotspot-tag">01 / RESEARCH</div>
+                            <div class="hotspot-text">Exploration of pattern topology & CLO3D simulation mechanics.</div>
+                        </div>
+                    </div>
+
+                    <div class="hotspot-pin" style="top: 60%; left: 70%;">
+                        <div class="hotspot-tooltip">
+                            <div class="hotspot-tag">02 / PROCESS</div>
+                            <div class="hotspot-text">Automated UV unwrapping & Draco mesh compression pipeline.</div>
+                        </div>
+                    </div>
+
+                    <div class="hotspot-pin" style="top: 45%; left: 50%;">
+                        <div class="hotspot-tooltip">
+                            <div class="hotspot-tag">03 / IMPACT</div>
+                            <div class="hotspot-text">${data.impact[0] ? data.impact[0].val + ' ' + data.impact[0].label : 'High efficiency delivery'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="takeover-sections-grid">
+                    <div class="takeover-card-box">
+                        <div class="takeover-box-header"><i class="fas fa-layer-group"></i> APPROACH & METHODOLOGY</div>
+                        <div class="takeover-approach-list">
+                            ${data.approach.map(step => `<div class="approach-chip">${step}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="takeover-card-box">
+                        <div class="takeover-box-header"><i class="fas fa-tools"></i> TOOLS & TECHNOLOGIES</div>
+                        <div class="takeover-tech-chips">
+                            ${data.tools.map(t => `<div class="takeover-tech-badge">${t}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="takeover-card-box" style="margin-top: 30px;">
+                    <div class="takeover-box-header"><i class="fas fa-chart-line"></i> METRICS & EVIDENCE</div>
+                    <div class="takeover-metrics-row">
+                        ${data.impact.map(m => `
+                            <div class="metric-takeover-card">
+                                <div class="metric-takeover-val">${m.val}</div>
+                                <div class="metric-takeover-lbl">${m.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="takeover-footer-nav">
+                    <button class="takeover-back-btn ht" onclick="exitSystem()">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>RETURN TO ECOSYSTEM</span>
+                    </button>
+                    <div style="display:flex; gap: 20px;">
+                        <span class="nav-system-link ht" onclick="enterSystem('${prevId}')">
+                            <i class="fas fa-chevron-left"></i> PREV NODE (${prevId})
+                        </span>
+                        <span class="nav-system-link ht" onclick="enterSystem('${nextId}')">
+                            NEXT NODE (${nextId}) <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            takeoverBody.innerHTML = html;
+            takeoverView.classList.add('active');
+            takeoverView.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            const backBtn = takeoverView.querySelector('.takeover-back-btn');
+            if (backBtn) backBtn.focus();
+        }
+
+        function exitSystem() {
+            if (!takeoverView) return;
+            takeoverView.classList.remove('active');
+            takeoverView.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+    </script>
+</body>
+</html>
+
