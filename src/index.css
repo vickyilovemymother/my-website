@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F4F5F7;
+    --bg-elevated: #FFFFFF;
+    --text-primary: #171717;
+    --text-secondary: #737373;
+    --border-subtle: #E5E7EB;
+    --border-medium: #D1D5DB;
+    --accent: #2563EB;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ==========================================================================
+   A4 PORTRAIT PRINT & PDF EXPORT STYLES
+   Ensures clean alignment, zero cropping, and perfect A4 portrait flow
+   ========================================================================== */
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm 14mm 12mm;
+}
+
+@media print {
+  /* Hide non-printable navigation, particles, interactive buttons, and modals */
+  header,
+  nav,
+  canvas,
+  button,
+  .spotlight-nav,
+  [data-antigravity],
+  .fixed,
+  .backdrop-blur-md,
+  .backdrop-blur-xl,
+  iframe {
+    display: none !important;
+  }
+
+  /* Reset document flow and containers */
+  html, body {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Unconstrain wrappers */
+  #root, main, div, section {
+    position: static !important;
+    transform: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  section {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+    break-inside: auto !important;
+  }
+
+  /* Avoid cutting cards or case studies across page boundaries */
+  article,
+  .project-card,
+  .rounded-2xl,
+  .rounded-3xl,
+  .border {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 16px !important;
+    box-shadow: none !important;
+    border-color: #E5E7EB !important;
+  }
+
+  /* Keep headings with their content */
+  h1, h2, h3, h4 {
+    color: #111827 !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Images must scale to fit A4 width without cropping */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+
+  /* Grid layout adjustment for print width */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 16px !important;
+    width: 100% !important;
+  }
+
+  /* Clean up text contrast */
+  p, span, div {
+    color: #374151 !important;
+  }
+
+  /* Show links if needed without clutter */
+  a {
+    color: #111827 !important;
+    text-decoration: none !important;
+  }
+}

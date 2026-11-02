@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vickylive.com/sitemap.xml
